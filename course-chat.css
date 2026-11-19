@@ -121,6 +121,12 @@ body:has(.mobile-menu.open) .course-chat {
   margin-top: .6rem;
 }
 
+.course-chat-message a {
+  color: var(--cyan-d);
+  text-decoration: underline;
+  text-underline-offset: .15em;
+}
+
 .course-chat-message-user {
   margin-right: auto;
   border-color: rgba(var(--nn-node2), .28);

@@ -15,6 +15,56 @@
   const viewport = window.visualViewport;
   const history = [];
 
+  // Match HTML-looking text and invalid Markdown destinations as whole tokens,
+  // so their contents are not picked up as standalone links.
+  const answerTokens = /<[^<>]*>|\[(?<label>[^\[\]\r\n]+)\]\((?<destination>(?:[^()\r\n]|\([^()\r\n]*\))*)\)|\*\*(?<bold>[^\r\n]+?)\*\*|(?<=^|[\s([«“‘،؛؟])(?<bare>https:\/\/(?:[^\s<>()\[\]{}*`،؛؟…]|\([^()\s<>]*\)|\[[^\[\]\s<>]*\])+)/giu;
+
+  function parseHttpsUrl(destination) {
+    if (!/^https:\/\/[^/?#@]+(?:[/?#]|$)/i.test(destination) || /[\s\p{Cc}\p{Cf}<>"'`\\]/u.test(destination)) {
+      return null;
+    }
+    try {
+      const url = new URL(destination);
+      return url.protocol === "https:" ? url : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function renderAnswer(parent, text) {
+    let position = 0;
+    for (const match of text.matchAll(answerTokens)) {
+      const [token] = match;
+      const { label, destination, bold, bare } = match.groups;
+      parent.append(text.slice(position, match.index));
+      position = match.index + token.length;
+
+      if (bold !== undefined) {
+        const strong = document.createElement("strong");
+        renderAnswer(strong, bold);
+        parent.append(strong);
+        continue;
+      }
+
+      const bareUrl = bare?.replace(/[.,!?;:»”’]+$/u, "");
+      const url = parseHttpsUrl(destination ?? bareUrl ?? "");
+      if (!url) {
+        parent.append(token);
+        continue;
+      }
+
+      const link = document.createElement("a");
+      link.href = url.href;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.dir = bare ? "ltr" : "auto";
+      link.textContent = label ?? bareUrl;
+      parent.append(link);
+      if (bare) parent.append(bare.slice(bareUrl.length));
+    }
+    parent.append(text.slice(position));
+  }
+
   function scrollToLatest() {
     log.scrollTop = log.scrollHeight;
   }
@@ -48,7 +98,8 @@
     const message = document.createElement("p");
     message.className = fromUser ? "course-chat-message course-chat-message-user" : "course-chat-message";
     message.dir = "auto";
-    message.textContent = text;
+    if (fromUser) message.textContent = text;
+    else renderAnswer(message, text);
     exchange.appendChild(message);
     scrollToLatest();
   }
