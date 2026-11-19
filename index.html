@@ -29,7 +29,7 @@
 (function(){
   try{
     var t=localStorage.getItem('theme');
-    if(!t){ t=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'; }
+    if(!t){ t=window.matchMedia('(prefers-color-scheme: dark)').matches?'light':'dark'; }
     document.documentElement.setAttribute('data-theme',t);
     var m=document.getElementById('metaTheme'); if(m) m.setAttribute('content', t==='light'?'#f8fafc':'#080b14');
   }catch(e){}
