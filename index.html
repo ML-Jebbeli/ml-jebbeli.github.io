@@ -620,6 +620,7 @@ section{position:relative;padding:3.25rem 0}
   .intro-pill .dot::before,.stage-node .ring,.float-tg::before,.video-play::before{animation:none!important}
 }
 </style>
+<link rel="stylesheet" href="course-chat.css" />
 </head>
 <body>
 
@@ -1304,5 +1305,34 @@ initCounters();initReveal();initCodeWindow();
 var heroNN=initNeuralCanvas("heroCanvas");var finalNN=initNeuralCanvas("finalCanvas");
 window.__nnRepaint=function(){if(heroNN&&heroNN.repaint)heroNN.repaint();if(finalNN&&finalNN.repaint)finalNN.repaint()};
 </script>
+
+<div class="course-chat" lang="fa" dir="rtl">
+  <button class="course-chat-launch" id="courseChatLaunch" type="button" aria-expanded="false" aria-controls="courseChatPanel" hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20 11.5a8 8 0 0 1-8 8H4l1.7-3.5a8 8 0 1 1 14.3-4.5Z"/><path d="M9 11.5h6m-3-3v6"/>
+    </svg>
+    دستیار دوره
+  </button>
+  <div class="course-chat-panel" id="courseChatPanel" role="dialog" aria-labelledby="courseChatTitle" hidden>
+    <header class="course-chat-header">
+      <h2 id="courseChatTitle">دستیار هوش مصنوعی دوره</h2>
+      <button class="course-chat-close" id="courseChatClose" type="button" aria-label="بستن گفتگو">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+    <div class="course-chat-log" id="courseChatLog" role="log" aria-label="پیام‌های گفتگو" tabindex="0">
+      <p class="course-chat-message">سلام! دربارهٔ پیش‌نیازها، سرفصل‌ها یا مسیر یادگیری سؤال داری؟</p>
+    </div>
+    <footer class="course-chat-footer">
+      <p class="course-chat-status" id="courseChatStatus" role="status"></p>
+      <form class="course-chat-form" id="courseChatForm">
+        <textarea id="courseChatInput" rows="2" maxlength="1000" required aria-label="سؤال شما" placeholder="سؤالت رو بنویس…"></textarea>
+        <button class="course-chat-send" id="courseChatSend" type="submit">ارسال</button>
+      </form>
+      <p class="course-chat-help">شهریه، زمان شروع و نحوهٔ برگزاری هنوز اعلام نشده. <a href="https://t.me/Iustech_support" target="_blank" rel="noopener noreferrer">پشتیبانی تلگرام</a></p>
+    </footer>
+  </div>
+</div>
+<script src="course-chat.js" defer></script>
 </body>
 </html>
