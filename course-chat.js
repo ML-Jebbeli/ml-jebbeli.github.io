@@ -1,5 +1,7 @@
 (() => {
-  const endpoint = "https://jebbeli-ai-assistant.sedamir77.workers.dev";
+  const endpoint = window.location.hostname === "jebbeli-ai-preview.pages.dev"
+    ? "https://jebbeli-ai-assistant-hardening-preview.sedamir77.workers.dev"
+    : "https://jebbeli-ai-assistant.sedamir77.workers.dev";
   const visibleExchangeLimit = 6;
   const historyMessageLimit = 6;
   const requestTimeout = 30000;
@@ -104,6 +106,35 @@
     scrollToLatest();
   }
 
+  function retryAfterSeconds(header) {
+    const value = header?.trim();
+    if (!value) return null;
+
+    if (/^\d+$/.test(value)) {
+      const seconds = Number(value);
+      return Number.isSafeInteger(seconds) ? seconds : null;
+    }
+
+    const date = new Date(value);
+    if (!Number.isFinite(date.getTime()) || date.toUTCString() !== value) return null;
+    return Math.max(0, Math.ceil((date.getTime() - Date.now()) / 1000));
+  }
+
+  function rateLimitMessage(header) {
+    const message = "تعداد درخواست‌ها زیاد شده.";
+    let seconds = retryAfterSeconds(header);
+    if (seconds === null) return `${message} کمی صبر کن و دوباره تلاش کن.`;
+    if (seconds === 0) return `${message} می‌تونی دوباره تلاش کنی.`;
+
+    const duration = [];
+    for (const [size, unit] of [[86400, "روز"], [3600, "ساعت"], [60, "دقیقه"], [1, "ثانیه"]]) {
+      const count = Math.floor(seconds / size);
+      if (count) duration.push(`${count.toLocaleString("fa-IR")} ${unit}`);
+      seconds %= size;
+    }
+    return `${message} لطفاً ${duration.join(" و ")} صبر کن و دوباره تلاش کن.`;
+  }
+
   launch.addEventListener("click", () => setOpen(true));
   close.addEventListener("click", () => setOpen(false));
   panel.addEventListener("keydown", (event) => {
@@ -153,7 +184,9 @@
         signal: controller.signal,
       });
       if (response.status === 429) {
-        errorMessage = "تعداد درخواست‌ها زیاد شده. کمی صبر کن و دوباره تلاش کن.";
+        errorMessage = rateLimitMessage(response.headers.get("Retry-After"));
+      } else if (response.status === 503) {
+        errorMessage = "سرویس دستیار موقتاً در دسترس نیست. کمی بعد دوباره تلاش کن.";
       }
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
@@ -171,8 +204,10 @@
       );
       if (history.length > historyMessageLimit) history.splice(0, 2);
     } catch (error) {
-      if (error.name === "AbortError") {
+      if (controller.signal.aborted) {
         errorMessage = "زمان انتظار برای پاسخ به پایان رسید. لطفاً دوباره تلاش کن.";
+      } else if (error instanceof TypeError) {
+        errorMessage = "ارتباط با دستیار برقرار نشد. اینترنتت رو بررسی کن و دوباره تلاش کن.";
       }
       status.textContent = errorMessage;
       if (!input.value) input.value = question;
