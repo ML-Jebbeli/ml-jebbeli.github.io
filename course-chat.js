@@ -1,6 +1,7 @@
 (() => {
   const endpoint = "https://jebbeli-ai-assistant.sedamir77.workers.dev";
-  const historyLimit = 6;
+  const visibleExchangeLimit = 6;
+  const historyMessageLimit = 6;
   const requestTimeout = 30000;
   const launch = document.getElementById("courseChatLaunch");
   const panel = document.getElementById("courseChatPanel");
@@ -12,6 +13,7 @@
   const send = document.getElementById("courseChatSend");
   const widget = launch.parentElement;
   const viewport = window.visualViewport;
+  const history = [];
 
   function scrollToLatest() {
     log.scrollTop = log.scrollHeight;
@@ -78,7 +80,7 @@
     exchange.className = "course-chat-exchange";
     log.appendChild(exchange);
     // Keep the greeting and the latest exchanges, including after closing the panel.
-    if (log.children.length > historyLimit + 1) log.children[1].remove();
+    if (log.children.length > visibleExchangeLimit + 1) log.children[1].remove();
     appendMessage(exchange, question, true);
     input.value = "";
     if (document.activeElement === send) input.focus({ preventScroll: true });
@@ -88,13 +90,15 @@
 
     const controller = new AbortController();
     const deadline = setTimeout(() => controller.abort(), requestTimeout);
+    const payload = { message: question };
+    if (history.length) payload.history = history;
     let errorMessage = "دریافت پاسخ ممکن نشد. دوباره تلاش کن یا با پشتیبانی در تماس باش.";
     try {
       const response = await fetch(endpoint, {
         method: "POST",
         credentials: "omit",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: question }),
+        body: JSON.stringify(payload),
         signal: controller.signal,
       });
       if (response.status === 429) {
@@ -106,7 +110,15 @@
         throw new Error("Missing answer");
       }
       status.textContent = "";
-      appendMessage(exchange, data.answer.trim());
+      const answer = data.answer.trim();
+      appendMessage(exchange, answer);
+      // Drop a dangling high surrogate if the history limit cuts an emoji in half.
+      const historyAnswer = answer.slice(0, input.maxLength).replace(/[\uD800-\uDBFF]$/u, "");
+      history.push(
+        { role: "user", content: question },
+        { role: "assistant", content: historyAnswer },
+      );
+      if (history.length > historyMessageLimit) history.splice(0, 2);
     } catch (error) {
       if (error.name === "AbortError") {
         errorMessage = "زمان انتظار برای پاسخ به پایان رسید. لطفاً دوباره تلاش کن.";
