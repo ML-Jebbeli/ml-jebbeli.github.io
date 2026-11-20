@@ -127,6 +127,23 @@ body:has(.mobile-menu.open) .course-chat {
   text-underline-offset: .15em;
 }
 
+.course-chat-message pre {
+  max-width: 100%;
+  margin: .35rem 0;
+  padding: .5rem;
+  overflow-x: auto;
+  white-space: pre;
+  text-align: left;
+  background: var(--bg-soft);
+  border-radius: .45rem;
+  font-size: .8rem;
+}
+
+.course-chat-message code {
+  font-family: ui-monospace, monospace;
+  unicode-bidi: isolate;
+}
+
 .course-chat-message-user {
   margin-right: auto;
   border-color: rgba(var(--nn-node2), .28);

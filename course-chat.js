@@ -5,7 +5,10 @@
   const endpoint = "https://jebbeli-ai-quota-lab-01.sedamir77.workers.dev";
   const visibleExchangeLimit = 6;
   const historyMessageLimit = 6;
-  const requestTimeout = 30000;
+  const requestTimeout = 60000;
+  const slowResponseDelay = 12000;
+  const requestBodyLimit = 32 * 1024;
+  const encoder = new TextEncoder();
   const launch = document.getElementById("courseChatLaunch");
   const panel = document.getElementById("courseChatPanel");
   const close = document.getElementById("courseChatClose");
@@ -20,7 +23,7 @@
 
   // Match HTML-looking text and invalid Markdown destinations as whole tokens,
   // so their contents are not picked up as standalone links.
-  const answerTokens = /<[^<>]*>|\[(?<label>[^\[\]\r\n]+)\]\((?<destination>(?:[^()\r\n]|\([^()\r\n]*\))*)\)|\*\*(?<bold>[^\r\n]+?)\*\*|(?<=^|[\s([«“‘،؛؟])(?<bare>https:\/\/(?:[^\s<>()\[\]{}*`،؛؟…]|\([^()\s<>]*\)|\[[^\[\]\s<>]*\])+)/giu;
+  const answerTokens = /<[^<>]*>|\[(?<label>[^\[\]\r\n]+)\]\((?<destination>(?:[^()\r\n]|\([^()\r\n]*\))*)\)|`(?<inlineCode>[^`\r\n]+)`|(?<!\\)\*\*(?<bold>[^\r\n]+?)\*\*|(?<=^|[\s([«“‘،؛؟])(?<bare>https:\/\/(?:[^\s<>()\[\]{}*`،؛؟…]|\([^()\s<>]*\)|\[[^\[\]\s<>]*\])+)/giu;
 
   function parseHttpsUrl(destination) {
     if (!/^https:\/\/[^/?#@]+(?:[/?#]|$)/i.test(destination) || /[\s\p{Cc}\p{Cf}<>"'`\\]/u.test(destination)) {
@@ -34,17 +37,27 @@
     }
   }
 
-  function renderAnswer(parent, text) {
+  function renderProse(parent, text) {
+    const plainText = (value) => value.replace(/\\([*#])/gu, "$1");
+    text = text.replace(/^[ \t]{0,3}#{1,6}[ \t]+/gmu, "")
+      .replace(/^[ \t]*(?:[-+*]|\\\*)[ \t]+/gmu, "• ");
     let position = 0;
     for (const match of text.matchAll(answerTokens)) {
       const [token] = match;
-      const { label, destination, bold, bare } = match.groups;
-      parent.append(text.slice(position, match.index));
+      const { label, destination, inlineCode, bold, bare } = match.groups;
+      parent.append(plainText(text.slice(position, match.index)));
       position = match.index + token.length;
 
+      if (inlineCode !== undefined) {
+        const code = document.createElement("code");
+        code.dir = "ltr";
+        code.textContent = inlineCode;
+        parent.append(code);
+        continue;
+      }
       if (bold !== undefined) {
         const strong = document.createElement("strong");
-        renderAnswer(strong, bold);
+        renderProse(strong, bold);
         parent.append(strong);
         continue;
       }
@@ -65,7 +78,23 @@
       parent.append(link);
       if (bare) parent.append(bare.slice(bareUrl.length));
     }
-    parent.append(text.slice(position));
+    parent.append(plainText(text.slice(position)));
+  }
+
+  function renderAnswer(parent, text) {
+    const sections = text.split(/^[ \t]{0,3}```[ \t]*[a-z0-9_+-]*[ \t]*\r?$/gimu);
+    for (const [index, section] of sections.entries()) {
+      if (index % 2 === 0) {
+        renderProse(parent, section);
+      } else {
+        const block = document.createElement("pre");
+        const code = document.createElement("code");
+        block.dir = "ltr";
+        code.textContent = section.replace(/^\r?\n|\r?\n$/gu, "");
+        block.appendChild(code);
+        parent.appendChild(block);
+      }
+    }
   }
 
   function scrollToLatest() {
@@ -98,7 +127,7 @@
   }
 
   function appendMessage(exchange, text, fromUser = false) {
-    const message = document.createElement("p");
+    const message = document.createElement(fromUser ? "p" : "div");
     message.className = fromUser ? "course-chat-message course-chat-message-user" : "course-chat-message";
     message.dir = "auto";
     if (fromUser) message.textContent = text;
@@ -141,6 +170,15 @@
     return `${message} لطفاً ${duration.join(" و ")} صبر کن و دوباره تلاش کن.`;
   }
 
+  function requestBody(message) {
+    // Send complete exchanges so the Worker can inspect full text before shortening it.
+    for (let start = 0; start < history.length; start += 2) {
+      const candidate = JSON.stringify({ message, history: history.slice(start) });
+      if (encoder.encode(candidate).byteLength <= requestBodyLimit) return candidate;
+    }
+    return JSON.stringify({ message });
+  }
+
   launch.addEventListener("click", () => setOpen(true));
   close.addEventListener("click", () => setOpen(false));
   panel.addEventListener("keydown", (event) => {
@@ -178,15 +216,16 @@
 
     const controller = new AbortController();
     const deadline = setTimeout(() => controller.abort(), requestTimeout);
-    const payload = { message: question };
-    if (history.length) payload.history = history;
+    const slowResponse = setTimeout(() => {
+      status.textContent = "آماده‌شدن پاسخ بیشتر طول کشیده؛ هنوز منتظریم.";
+    }, slowResponseDelay);
     let errorMessage = "دریافت پاسخ ممکن نشد. دوباره تلاش کن یا با پشتیبانی در تماس باش.";
     try {
       const response = await fetch(endpoint, {
         method: "POST",
         credentials: "omit",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: requestBody(question),
         signal: controller.signal,
       });
       if (response.status === 429) {
@@ -204,16 +243,14 @@
       status.textContent = "";
       const answer = data.answer.trim();
       appendMessage(exchange, answer);
-      // Drop a dangling high surrogate if the history limit cuts an emoji in half.
-      const historyAnswer = answer.slice(0, input.maxLength).replace(/[\uD800-\uDBFF]$/u, "");
       history.push(
         { role: "user", content: question },
-        { role: "assistant", content: historyAnswer },
+        { role: "assistant", content: answer },
       );
       if (history.length > historyMessageLimit) history.splice(0, 2);
     } catch (error) {
       if (controller.signal.aborted) {
-        errorMessage = "زمان انتظار برای پاسخ به پایان رسید. لطفاً دوباره تلاش کن.";
+        errorMessage = "پاسخ در زمان انتظار نرسید. اگر خواستی، خودت دوباره ارسال کن.";
       } else if (error instanceof TypeError) {
         errorMessage = "ارتباط با دستیار برقرار نشد. اینترنتت رو بررسی کن و دوباره تلاش کن.";
       }
@@ -221,6 +258,7 @@
       if (!input.value) input.value = question;
     } finally {
       clearTimeout(deadline);
+      clearTimeout(slowResponse);
       send.disabled = false;
     }
   });
