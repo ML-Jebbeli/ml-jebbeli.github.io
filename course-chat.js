@@ -1,8 +1,8 @@
 (() => {
-  const isQuotaPreview = window.location.hostname === "jebbeli-ai-preview.pages.dev";
-  const endpoint = isQuotaPreview
-    ? "https://jebbeli-ai-quota-lab-01.sedamir77.workers.dev"
-    : "https://jebbeli-ai-assistant.sedamir77.workers.dev";
+  const hostname = window.location.hostname;
+  if (hostname !== "ml-jebbeli.github.io" && hostname !== "jebbeli-ai-preview.pages.dev") return;
+
+  const endpoint = "https://jebbeli-ai-quota-lab-01.sedamir77.workers.dev";
   const visibleExchangeLimit = 6;
   const historyMessageLimit = 6;
   const requestTimeout = 30000;
@@ -190,7 +190,7 @@
         signal: controller.signal,
       });
       if (response.status === 429) {
-        const data = isQuotaPreview ? await response.json().catch(() => null) : null;
+        const data = await response.json().catch(() => null);
         const code = data?.error?.code ?? data?.code;
         errorMessage = rateLimitMessage(response.headers.get("Retry-After"), code);
       } else if (response.status === 503) {
