@@ -1,6 +1,7 @@
 (() => {
-  const endpoint = window.location.hostname === "jebbeli-ai-preview.pages.dev"
-    ? "https://jebbeli-ai-assistant-hardening-preview.sedamir77.workers.dev"
+  const isQuotaPreview = window.location.hostname === "jebbeli-ai-preview.pages.dev";
+  const endpoint = isQuotaPreview
+    ? "https://jebbeli-ai-quota-lab-01.sedamir77.workers.dev"
     : "https://jebbeli-ai-assistant.sedamir77.workers.dev";
   const visibleExchangeLimit = 6;
   const historyMessageLimit = 6;
@@ -120,10 +121,15 @@
     return Math.max(0, Math.ceil((date.getTime() - Date.now()) / 1000));
   }
 
-  function rateLimitMessage(header) {
-    const message = "تعداد درخواست‌ها زیاد شده.";
+  function rateLimitMessage(header, code) {
+    const dailyLimitReached = code === "DAILY_AI_LIMIT_REACHED";
+    const message = dailyLimitReached
+      ? "سهمیهٔ روزانهٔ دستیار به پایان رسیده."
+      : "تعداد درخواست‌ها زیاد شده.";
     let seconds = retryAfterSeconds(header);
-    if (seconds === null) return `${message} کمی صبر کن و دوباره تلاش کن.`;
+    if (seconds === null) {
+      return `${message} ${dailyLimitReached ? "بعداً" : "کمی صبر کن و"} دوباره تلاش کن.`;
+    }
     if (seconds === 0) return `${message} می‌تونی دوباره تلاش کنی.`;
 
     const duration = [];
@@ -184,7 +190,9 @@
         signal: controller.signal,
       });
       if (response.status === 429) {
-        errorMessage = rateLimitMessage(response.headers.get("Retry-After"));
+        const data = isQuotaPreview ? await response.json().catch(() => null) : null;
+        const code = data?.error?.code ?? data?.code;
+        errorMessage = rateLimitMessage(response.headers.get("Retry-After"), code);
       } else if (response.status === 503) {
         errorMessage = "سرویس دستیار موقتاً در دسترس نیست. کمی بعد دوباره تلاش کن.";
       }
