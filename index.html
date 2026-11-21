@@ -1308,28 +1308,73 @@ window.__nnRepaint=function(){if(heroNN&&heroNN.repaint)heroNN.repaint();if(fina
 
 <div class="course-chat" lang="fa" dir="rtl">
   <button class="course-chat-launch" id="courseChatLaunch" type="button" aria-expanded="false" aria-controls="courseChatPanel" hidden>
+    <span class="course-chat-brand" aria-hidden="true">
+      <span>IUS</span><img src="ax.png" width="44" height="44" alt="" />
+    </span>
+    <span class="course-chat-launch-text">
+      <strong>از دستیار هوشمند بپرس</strong>
+      <small>دوره، مدرس و یادگیری ماشین</small>
+    </span>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M20 11.5a8 8 0 0 1-8 8H4l1.7-3.5a8 8 0 1 1 14.3-4.5Z"/><path d="M9 11.5h6m-3-3v6"/>
+      <path d="M20 11.5a8 8 0 0 1-8 8H8l-3 2 1-4a8 8 0 1 1 14-5.5Z"/><path d="M9 11.5h6"/>
     </svg>
-    دستیار دوره
   </button>
   <div class="course-chat-panel" id="courseChatPanel" role="dialog" aria-labelledby="courseChatTitle" hidden>
     <header class="course-chat-header">
-      <h2 id="courseChatTitle">دستیار هوش مصنوعی دوره</h2>
+      <span class="course-chat-brand" aria-hidden="true">
+        <span>IUS</span><img src="ax.png" width="44" height="44" alt="" />
+      </span>
+      <div class="course-chat-heading">
+        <h2 id="courseChatTitle">دستیار هوشمند <bdi lang="en">IUSTech</bdi></h2>
+        <p>پاسخ‌گوی سؤال‌های دوره و یادگیری ماشین</p>
+      </div>
       <button class="course-chat-close" id="courseChatClose" type="button" aria-label="بستن گفتگو">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
       </button>
     </header>
-    <div class="course-chat-log" id="courseChatLog" role="log" aria-label="پیام‌های گفتگو" tabindex="0">
-      <p class="course-chat-message">سلام! دربارهٔ پیش‌نیازها، سرفصل‌ها یا مسیر یادگیری سؤال داری؟</p>
+    <div class="course-chat-welcome" id="courseChatWelcome">
+      <div class="course-chat-intro">
+        <span class="course-chat-brand" aria-hidden="true">
+          <span>IUS</span><img src="ax.png" width="66" height="66" alt="" />
+        </span>
+        <h3>سلام! چی دوست داری بدونی؟</h3>
+        <p>دربارهٔ دوره، مدرس یا مسیر یادگیری سؤال بپرس.</p>
+      </div>
+      <div class="course-chat-suggestions" role="group" aria-label="پرسش‌های پیشنهادی">
+        <button type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h12v16H7a3 3 0 0 1 0-6h12M7 4a3 3 0 0 0-3 3v10m5-8h6"/></svg>
+          <span>دوره از صفر شروع می‌شه؟</span>
+        </button>
+        <button type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 6-5 6 5 6m8-12 5 6-5 6m-3-13-2 14"/></svg>
+          <span>برای شروع پایتون چه منابعی هست؟</span>
+        </button>
+        <button type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2"/></svg>
+          <span>مدرس دوره چه سوابقی داره؟</span>
+        </button>
+        <button type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 4v4m8-4v4M4 11h16m-12 4h2m4 0h2"/></svg>
+          <span>زمان و شهریهٔ دوره اعلام شده؟</span>
+        </button>
+      </div>
     </div>
+    <div class="course-chat-log" id="courseChatLog" role="log" aria-label="پیام‌های گفتگو" tabindex="0" hidden></div>
     <footer class="course-chat-footer">
-      <p class="course-chat-status" id="courseChatStatus" role="status"></p>
+      <div class="course-chat-status-row">
+        <span class="course-chat-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+        <p class="course-chat-status" id="courseChatStatus" role="status" aria-atomic="true"></p>
+      </div>
       <form class="course-chat-form" id="courseChatForm">
-        <textarea id="courseChatInput" rows="2" maxlength="500" required aria-label="سؤال شما" placeholder="سؤالت رو بنویس…"></textarea>
-        <button class="course-chat-send" id="courseChatSend" type="submit">ارسال</button>
+        <textarea id="courseChatInput" rows="2" maxlength="500" required aria-label="سؤال شما" aria-describedby="courseChatCount" placeholder="سؤالت را دربارهٔ دوره یا یادگیری ماشین بپرس…"></textarea>
+        <button class="course-chat-send" id="courseChatSend" type="submit" aria-label="ارسال سؤال">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 18V6m-6 6 6-6 6 6"/></svg>
+        </button>
       </form>
-      <p class="course-chat-help">شهریه، زمان شروع و نحوهٔ برگزاری هنوز اعلام نشده. <a href="https://t.me/Iustech_support" target="_blank" rel="noopener noreferrer">پشتیبانی تلگرام</a></p>
+      <div class="course-chat-meta">
+        <p class="course-chat-help"><a href="https://t.me/Iustech_support" target="_blank" rel="noopener noreferrer">پشتیبانی تلگرام</a></p>
+        <span class="course-chat-count" id="courseChatCount" hidden></span>
+      </div>
     </footer>
   </div>
 </div>

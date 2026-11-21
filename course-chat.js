@@ -13,13 +13,18 @@
   const panel = document.getElementById("courseChatPanel");
   const close = document.getElementById("courseChatClose");
   const log = document.getElementById("courseChatLog");
+  const welcome = document.getElementById("courseChatWelcome");
   const status = document.getElementById("courseChatStatus");
   const form = document.getElementById("courseChatForm");
   const input = document.getElementById("courseChatInput");
+  const count = document.getElementById("courseChatCount");
   const send = document.getElementById("courseChatSend");
   const widget = launch.parentElement;
+  const brand = panel.querySelector(".course-chat-brand");
   const viewport = window.visualViewport;
+  const formatNumber = new Intl.NumberFormat("fa-IR");
   const history = [];
+  let followLatest = true;
 
   // Match HTML-looking text and invalid Markdown destinations as whole tokens,
   // so their contents are not picked up as standalone links.
@@ -90,6 +95,8 @@
         const block = document.createElement("pre");
         const code = document.createElement("code");
         block.dir = "ltr";
+        block.tabIndex = 0;
+        block.setAttribute("aria-label", "نمونهٔ کد");
         code.textContent = section.replace(/^\r?\n|\r?\n$/gu, "");
         block.appendChild(code);
         parent.appendChild(block);
@@ -99,6 +106,10 @@
 
   function scrollToLatest() {
     log.scrollTop = log.scrollHeight;
+  }
+
+  function isNearLatest() {
+    return log.scrollHeight - log.scrollTop - log.clientHeight <= 48;
   }
 
   function fitViewport() {
@@ -113,6 +124,7 @@
   }
 
   function setOpen(open) {
+    if (!open) followLatest = isNearLatest();
     panel.hidden = !open;
     launch.hidden = open;
     launch.setAttribute("aria-expanded", String(open));
@@ -120,7 +132,7 @@
     if (open) {
       const focusTarget = matchMedia("(pointer: coarse)").matches ? close : input;
       focusTarget.focus({ preventScroll: true });
-      scrollToLatest();
+      if (followLatest) scrollToLatest();
     } else {
       launch.focus({ preventScroll: true });
     }
@@ -130,10 +142,27 @@
     const message = document.createElement(fromUser ? "p" : "div");
     message.className = fromUser ? "course-chat-message course-chat-message-user" : "course-chat-message";
     message.dir = "auto";
-    if (fromUser) message.textContent = text;
-    else renderAnswer(message, text);
-    exchange.appendChild(message);
-    scrollToLatest();
+    if (fromUser) {
+      message.textContent = text;
+      exchange.appendChild(message);
+      return;
+    }
+
+    const answer = document.createElement("div");
+    answer.className = "course-chat-answer";
+    const avatar = brand.cloneNode(true);
+    avatar.classList.add("course-chat-avatar");
+    renderAnswer(message, text);
+    answer.append(message, avatar);
+    exchange.appendChild(answer);
+  }
+
+  function updateCharacterCount() {
+    const length = input.value.length;
+    count.hidden = length < input.maxLength - 50;
+    count.textContent = count.hidden
+      ? ""
+      : `${formatNumber.format(length)} از ${formatNumber.format(input.maxLength)} نویسه`;
   }
 
   function retryAfterSeconds(header) {
@@ -181,6 +210,19 @@
 
   launch.addEventListener("click", () => setOpen(true));
   close.addEventListener("click", () => setOpen(false));
+  widget.addEventListener("error", (event) => {
+    if (event.target.matches(".course-chat-brand img")) event.target.hidden = true;
+  }, true);
+  widget.querySelectorAll(".course-chat-brand img").forEach((image) => {
+    if (image.complete && !image.naturalWidth) image.hidden = true;
+  });
+  welcome.querySelectorAll(".course-chat-suggestions button").forEach((button) => {
+    button.addEventListener("click", () => {
+      input.value = button.textContent.trim();
+      updateCharacterCount();
+      input.focus({ preventScroll: true });
+    });
+  });
   panel.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && !event.isComposing) {
       event.stopPropagation();
@@ -190,6 +232,7 @@
   viewport?.addEventListener("resize", fitViewport);
   viewport?.addEventListener("scroll", fitViewport);
 
+  input.addEventListener("input", updateCharacterCount);
   input.addEventListener("keydown", (event) => {
     if (event.key === "Enter" && !event.shiftKey && !event.isComposing && event.keyCode !== 229) {
       event.preventDefault();
@@ -204,14 +247,18 @@
 
     const exchange = document.createElement("div");
     exchange.className = "course-chat-exchange";
+    welcome.hidden = true;
+    log.hidden = false;
     log.appendChild(exchange);
-    // Keep the greeting and the latest exchanges, including after closing the panel.
-    if (log.children.length > visibleExchangeLimit + 1) log.children[1].remove();
+    // Keep the latest exchanges, including after closing the panel.
+    if (log.children.length > visibleExchangeLimit) log.firstElementChild.remove();
     appendMessage(exchange, question, true);
     input.value = "";
+    updateCharacterCount();
     if (document.activeElement === send) input.focus({ preventScroll: true });
     send.disabled = true;
-    status.textContent = "در حال دریافت پاسخ…";
+    status.dataset.state = "pending";
+    status.textContent = "در حال آماده‌سازی پاسخ…";
     scrollToLatest();
 
     const controller = new AbortController();
@@ -242,7 +289,9 @@
       }
       status.textContent = "";
       const answer = data.answer.trim();
+      const followAnswer = !panel.hidden && isNearLatest();
       appendMessage(exchange, answer);
+      if (followAnswer) scrollToLatest();
       history.push(
         { role: "user", content: question },
         { role: "assistant", content: answer },
@@ -256,9 +305,11 @@
       }
       status.textContent = errorMessage;
       if (!input.value) input.value = question;
+      updateCharacterCount();
     } finally {
       clearTimeout(deadline);
       clearTimeout(slowResponse);
+      delete status.dataset.state;
       send.disabled = false;
     }
   });
