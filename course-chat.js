@@ -1,5 +1,5 @@
-import { renderAnswer } from "./course-chat-render.js?v=3";
-import { closeDialog, copyText, hasOtherModal, listenToMedia, openModal } from "./site-ui.js?v=3";
+import { renderAnswer } from "./course-chat-render.js?v=4";
+import { closeDialog, copyText, hasOtherModal, listenToMedia, openModal } from "./site-ui.js?v=4";
 
 const approvedHosts = new Set(["ml-jebbeli.github.io", "jebbeli-ai-preview.pages.dev"]);
 const endpoint = "https://jebbeli-ai-quota-lab-01.sedamir77.workers.dev/";
@@ -8,6 +8,7 @@ const historyMessageLimit = 6;
 const requestTimeout = 60000;
 const slowResponseDelay = 12000;
 const requestBodyLimit = 32 * 1024;
+const variantPreference = "course-chat-layout";
 const encoder = new TextEncoder();
 const fa = new Intl.NumberFormat("fa-IR");
 
@@ -68,6 +69,10 @@ function init() {
   const input = byId("Input");
   const count = byId("Count");
   const send = byId("Send");
+  const variantToggle = byId("Variant");
+  const rail = byId("Rail");
+  const recent = byId("Recent");
+  const recentList = recent.querySelector("ul");
   const widget = launch.parentElement;
   const avatarTemplate = panel.querySelector(".course-chat-brand");
   const viewport = window.visualViewport;
@@ -91,6 +96,50 @@ function init() {
 
   function updateJump() {
     jump.hidden = log.hidden || followLatest || nearLatest();
+  }
+
+  function updateRecent() {
+    if (rail.hidden) return;
+    const turns = exchanges.slice(-3).reverse();
+    const items = turns.map(({ question, element }) => {
+      const item = document.createElement("li");
+      const button = document.createElement("button");
+      button.type = "button";
+      button.dir = "auto";
+      button.textContent = question;
+      button.addEventListener("click", () => {
+        log.focus({ preventScroll: true });
+        log.scrollTop += element.getBoundingClientRect().top - log.getBoundingClientRect().top;
+        followLatest = nearLatest();
+        updateJump();
+      });
+      item.append(button);
+      return item;
+    });
+    recentList.replaceChildren(...items);
+    recent.hidden = turns.length === 0;
+  }
+
+  function selectVariant(focused, remember = false) {
+    // Keep the reading position when longer lines rewrap in the other layout.
+    const keepPosition = panel.open && !log.hidden && !followLatest;
+    const logTop = keepPosition ? log.getBoundingClientRect().top : 0;
+    const anchor = keepPosition
+      ? exchanges.find(({ element }) => element.getBoundingClientRect().bottom > logTop)?.element : null;
+    const offset = anchor ? anchor.getBoundingClientRect().top - logTop : 0;
+    const layout = focused ? "focused" : "classic";
+    widget.dataset.variant = layout;
+    variantToggle.setAttribute("aria-pressed", String(focused));
+    rail.hidden = !focused;
+    updateRecent();
+    if (remember) {
+      try { localStorage.setItem(variantPreference, layout); } catch {}
+    }
+    if (panel.open) {
+      fitViewport();
+      if (anchor) log.scrollTop += anchor.getBoundingClientRect().top - log.getBoundingClientRect().top - offset;
+      updateJump();
+    }
   }
 
   function scrollToLatest() {
@@ -229,6 +278,7 @@ function init() {
     exchanges.push(exchange);
     log.append(element);
     if (exchanges.length > visibleExchangeLimit) exchanges.shift().element.remove();
+    updateRecent();
     scrollToLatest();
     return exchange;
   }
@@ -386,6 +436,18 @@ function init() {
 
   launch.addEventListener("click", () => togglePanel(true));
   close.addEventListener("click", () => togglePanel(false));
+  variantToggle.addEventListener("click", () => selectVariant(widget.dataset.variant !== "focused", true));
+  for (const link of rail.querySelectorAll('a[href^="#"]')) {
+    link.addEventListener("click", (event) => {
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const section = document.getElementById(link.hash.slice(1));
+      togglePanel(false, { restore: !section });
+      if (section) {
+        if (!section.hasAttribute("tabindex")) section.tabIndex = -1;
+        section.focus({ preventScroll: true });
+      }
+    });
+  }
   panel.addEventListener("cancel", (event) => {
     event.preventDefault();
     togglePanel(false);
@@ -416,6 +478,7 @@ function init() {
       request.controller.abort();
     }
     exchanges.length = 0;
+    updateRecent();
     history.length = 0;
     contextRevision = 0;
     log.replaceChildren();
@@ -503,6 +566,9 @@ function init() {
   });
   if (!navigator.onLine) setStatus(offline, "offline");
   controls();
+  let savedVariant;
+  try { savedVariant = localStorage.getItem(variantPreference); } catch {}
+  if (savedVariant === "focused") selectVariant(true);
   launch.hidden = false;
 }
 

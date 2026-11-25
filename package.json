@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test test/frontend.test.mjs",
-    "test:content": "node test/content-integrity.mjs --check . && node test/content-states.mjs --check ."
+    "test:content": "node test/content-integrity.mjs --check . test/fixtures/content-baseline.json test/fixtures/chat-layout-content.json && node test/content-states.mjs --check ."
   },
   "devDependencies": {
     "acorn": "8.15.0",

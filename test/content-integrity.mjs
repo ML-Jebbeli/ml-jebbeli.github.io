@@ -123,15 +123,21 @@ if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.m
     console.log(JSON.stringify({ base, entries: Object.keys(current).length, manifest: filename }));
   } else if (action === "--check") {
     const before = JSON.parse(readFileSync(filename, "utf8"));
+    const additions = base ? JSON.parse(readFileSync(base, "utf8")) : {};
+    for (const id of Object.keys(additions)) {
+      if (Object.hasOwn(before.entries, id)) throw new Error(`An addition cannot override a baseline entry: ${id}`);
+    }
+    const expected = { ...before.entries, ...additions };
     const updated = hashed(current);
-    const differences = [...new Set([...Object.keys(before.entries), ...Object.keys(updated)])]
-      .filter(id => before.entries[id] !== updated[id]);
-    console.log(JSON.stringify({ base: before.base, entries: Object.keys(before.entries).length, differences: differences.length }));
+    const differences = [...new Set([...Object.keys(expected), ...Object.keys(updated)])]
+      .filter(id => expected[id] !== updated[id]);
+    console.log(JSON.stringify({ base: before.base, entries: Object.keys(before.entries).length,
+      approvedAdditions: Object.keys(additions).length, differences: differences.length }));
     if (differences.length) {
       console.error(differences.join("\n"));
       process.exitCode = 1;
     }
   } else {
-    throw new Error("Use --capture <root> <manifest> <base SHA> [raw file] or --check <root> <manifest>");
+    throw new Error("Use --capture <root> <manifest> <base SHA> [raw file] or --check <root> <manifest> [additions file]");
   }
 }
