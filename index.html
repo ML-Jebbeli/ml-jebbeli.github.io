@@ -66,11 +66,11 @@
 </script>
 
 <link rel="preload" href="assets/fonts/vazirmatn-arabic-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
-<link rel="stylesheet" href="site.css?v=3" />
+<link rel="stylesheet" href="site.css?v=4" />
 <link rel="preload" as="image" href="assets/instructor-320.webp"
   imagesrcset="assets/instructor-320.webp 320w, assets/instructor-640.webp 640w"
   imagesizes="(max-width: 639px) 9rem, (min-width: 75rem) 18rem, (min-width: 43rem) 24vw, 10.25rem" fetchpriority="high" />
-<link rel="stylesheet" href="course-chat.css?v=3" />
+<link rel="stylesheet" href="course-chat.css?v=4" />
 <noscript><style>
   @media (max-width: 71.999rem) {
     .navbar { position: static; background: var(--bg-card); }
@@ -721,7 +721,7 @@
   </div>
 </dialog>
 
-<div class="course-chat" lang="fa" dir="rtl">
+<div class="course-chat" lang="fa" dir="rtl" data-variant="classic">
   <button class="course-chat-launch" id="courseChatLaunch" type="button" aria-expanded="false" aria-controls="courseChatPanel" hidden>
     <span class="course-chat-brand" aria-hidden="true">
       <span>IUS</span><img src="assets/iustech-64.webp" srcset="assets/iustech-64.webp 1x, assets/iustech-128.webp 2x, assets/iustech-192.webp 3x" width="44" height="44" alt="" />
@@ -730,9 +730,10 @@
       <strong>از دستیار هوشمند بپرس</strong>
       <small>دوره، مدرس و منابع رسمی</small>
     </span>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M20 11.5a8 8 0 0 1-8 8H8l-3 2 1-4a8 8 0 1 1 14-5.5Z"/><path d="M9 11.5h6"/>
-    </svg>
+    <span class="course-chat-launch-action" id="courseChatLaunchAction">
+      <span>شروع گفتگو</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H4m6-6-6 6 6 6"/></svg>
+    </span>
   </button>
   <dialog class="course-chat-panel" id="courseChatPanel" aria-labelledby="courseChatTitle">
     <header class="course-chat-header">
@@ -751,6 +752,27 @@
       </button>
       </div>
     </header>
+    <aside class="course-chat-rail" id="courseChatRail" hidden>
+      <nav aria-labelledby="courseChatLinksTitle">
+        <p id="courseChatLinksTitle">پیوندهای رسمی</p>
+        <a href="#course">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h12v16H7a3 3 0 0 1 0-6h12M7 4a3 3 0 0 0-3 3v10"/></svg>
+          معرفی دوره
+        </a>
+        <a href="#resources">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5h14v14H5zM9 10h6m-6 4h4"/></svg>
+          منابع رایگان
+        </a>
+        <a href="https://t.me/Iustech_support" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a7 7 0 0 1-7 7H7l-3 2 1-4a7 7 0 1 1 15-5Z"/></svg>
+          پشتیبانی تلگرام
+        </a>
+      </nav>
+      <div class="course-chat-recent" id="courseChatRecent" hidden>
+        <p>پرسش‌های این گفتگو</p>
+        <ul></ul>
+      </div>
+    </aside>
     <div class="course-chat-welcome" id="courseChatWelcome">
       <div class="course-chat-intro">
         <span class="course-chat-brand" aria-hidden="true">
@@ -794,12 +816,16 @@
       </form>
       <div class="course-chat-meta">
         <p class="course-chat-help"><a href="https://t.me/Iustech_support" target="_blank" rel="noopener noreferrer">پشتیبانی تلگرام</a></p>
+        <button class="course-chat-variant" id="courseChatVariant" type="button" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M9 5v14"/></svg>
+          نمای متمرکز
+        </button>
         <span class="course-chat-count" id="courseChatCount">۰ از ۵۰۰ نویسه</span>
       </div>
     </div>
   </dialog>
 </div>
-<script src="site.js?v=3" type="module"></script>
-<script src="course-chat.js?v=3" type="module"></script>
+<script src="site.js?v=4" type="module"></script>
+<script src="course-chat.js?v=4" type="module"></script>
 </body>
 </html>

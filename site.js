@@ -1,4 +1,4 @@
-import { closeDialog, copyText, listenToMedia, openModal } from "./site-ui.js?v=3";
+import { closeDialog, copyText, listenToMedia, openModal } from "./site-ui.js?v=4";
 
 const page = document.documentElement;
 const byId = (id) => document.getElementById(id);

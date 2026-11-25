@@ -873,3 +873,216 @@ test("fresh and repeat loads use one version across all local entry points and m
   assert.deepEqual(errors, []);
   assert.deepEqual(missingFiles, []);
 });
+
+test("Classic is the default and the keyboard-accessible switch saves the selected experience", async (t) => {
+  const { page, calls } = await pageFor(t);
+  const widget = page.locator(".course-chat");
+  const toggle = page.locator("#courseChatVariant");
+  await openChat(page);
+  assert.equal(await widget.getAttribute("data-variant"), "classic");
+  assert.equal(await toggle.getAttribute("aria-pressed"), "false");
+  await hidden(page.locator("#courseChatRail"));
+  const classicWidth = (await page.locator("#courseChatPanel").boundingBox()).width;
+  await page.locator(".course-chat-suggestions button").first().click();
+  const draft = await inputFor(page).inputValue();
+
+  await toggle.press("Space");
+  assert.equal(await widget.getAttribute("data-variant"), "focused");
+  assert.equal(await toggle.getAttribute("aria-pressed"), "true");
+  assert.equal(await inputFor(page).inputValue(), draft);
+  assert.ok((await page.locator("#courseChatPanel").boundingBox()).width > classicWidth);
+  assert.equal(calls.length, 0);
+  await inputFor(page).press("Enter");
+  await visible(page.locator(".course-chat-answer"));
+  assert.equal(calls[0].message, draft);
+
+  await page.reload();
+  await openChat(page);
+  assert.equal(await toggle.getAttribute("aria-pressed"), "true");
+  assert.equal(await page.locator(".course-chat-exchange").count(), 0);
+  assert.deepEqual(await page.evaluate(() => Object.keys(localStorage).sort()), ["course-chat-layout", "theme"]);
+  await toggle.press("Enter");
+  await page.reload();
+  await openChat(page);
+  assert.equal(await toggle.getAttribute("aria-pressed"), "false");
+  assert.equal(calls.length, 1);
+});
+
+test("switching layouts preserves a pending exchange, next draft, history and active cooldown", async (t) => {
+  const held = gate();
+  t.after(() => held.resume());
+  const { page, calls } = await pageFor(t, {
+    beforeOpen: page => page.clock.install(),
+    response: async (_, index) => {
+      if (index === 1) await held.waiting;
+      if (index === 2) return { status: 429, headers: { "Retry-After": "10" }, json: { error: { code: "RATE_LIMITED" } } };
+      return { json: { answer: defaultAnswer } };
+    },
+  });
+  const toggle = page.locator("#courseChatVariant");
+  await openChat(page);
+  await ask(page, "پرسش نخست");
+  await visible(page.locator("#courseChatStop"));
+  await inputFor(page).fill("پرسش دوم");
+  await toggle.click();
+  assert.equal(await inputFor(page).inputValue(), "پرسش دوم");
+  assert.equal(await page.locator("#courseChatSend").isDisabled(), true);
+  held.resume();
+  await visible(page.locator(".course-chat-answer"));
+  await inputFor(page).press("Enter");
+  await visible(page.locator(".course-chat-failure"));
+  await toggle.click();
+  const retry = page.getByRole("button", { name: "تلاش دوباره" });
+  assert.equal(await retry.isDisabled(), true);
+  await page.clock.fastForward(10_020);
+  assert.equal(calls.length, 2);
+  await retry.click();
+  await visible(page.locator(".course-chat-answer").nth(1));
+  assert.deepEqual(calls[2], {
+    message: "پرسش دوم",
+    history: [{ role: "user", content: "پرسش نخست" }, { role: "assistant", content: defaultAnswer }],
+  });
+  assert.equal(await page.locator(".course-chat-exchange").count(), 2);
+});
+
+test("a stored layout value is optional and unavailable storage does not break the switch", async (t) => {
+  const { page, errors } = await pageFor(t, { initialize: () => {
+    const read = Storage.prototype.getItem;
+    const write = Storage.prototype.setItem;
+    Storage.prototype.getItem = function (key) {
+      if (key === "course-chat-layout") throw new Error("Storage unavailable");
+      return read.call(this, key);
+    };
+    Storage.prototype.setItem = function (key, value) {
+      if (key === "course-chat-layout") throw new Error("Storage unavailable");
+      return write.call(this, key, value);
+    };
+  } });
+  await openChat(page);
+  const toggle = page.locator("#courseChatVariant");
+  assert.equal(await toggle.getAttribute("aria-pressed"), "false");
+  await toggle.click();
+  assert.equal(await toggle.getAttribute("aria-pressed"), "true");
+  await ask(page, "دوره", 1);
+  assert.deepEqual(errors, []);
+});
+
+test("Focused navigation goes to real sections and recent questions stay bounded to the open conversation", async (t) => {
+  const { page, calls } = await pageFor(t, {
+    response: async () => ({ json: { answer: (defaultAnswer + "\n\n").repeat(12) } }),
+  });
+  await openChat(page);
+  await page.locator("#courseChatVariant").click();
+  const rail = page.locator("#courseChatRail");
+  await visible(rail);
+  assert.equal(await rail.getByRole("link", { name: "پشتیبانی تلگرام" }).getAttribute("href"), support);
+  const questions = ["نخست", "دوم", "سوم", "<img src=x>"];
+  for (const [index, question] of questions.entries()) await ask(page, question, index + 1);
+  const recent = page.locator("#courseChatRecent");
+  assert.deepEqual(await recent.locator("button").allTextContents(), questions.slice(1).reverse());
+  assert.equal(await recent.locator("img").count(), 0);
+  await recent.locator("button").last().press("Enter");
+  assert.equal(await page.evaluate(() => document.activeElement.id), "courseChatLog");
+  assert.equal(calls.length, questions.length);
+  await page.locator("#courseChatNew").click();
+  await hidden(recent);
+  await rail.getByRole("link", { name: "معرفی دوره" }).click();
+  await hidden(page.locator("#courseChatPanel"));
+  await page.waitForURL(/#course$/u);
+  assert.equal(await page.evaluate(() => document.activeElement.id), "course");
+});
+
+for (const [width, height, theme, railVisible] of [
+  [320, 568, "dark", false],
+  [390, 844, "light", false],
+  [768, 1024, "dark", true],
+  [820, 1180, "light", true],
+  [844, 390, "dark", false],
+  [1366, 768, "light", true],
+  [1440, 900, "dark", true],
+]) {
+  test(`launch banner and Focused controls fit ${width}x${height} ${theme}`, async (t) => {
+    const { page, errors, calls } = await pageFor(t, { width, height, theme });
+    const launcher = page.getByRole("button", { name: /شروع گفتگو/u });
+    const launchBounds = await launcher.boundingBox();
+    assert.ok(launchBounds && launchBounds.height >= 44 && launchBounds.x >= 0 &&
+      launchBounds.x + launchBounds.width <= width && launchBounds.y + launchBounds.height <= height);
+    await launcher.press("Enter");
+    const panel = page.locator("#courseChatPanel");
+    const toggle = page.locator("#courseChatVariant");
+    await toggle.click();
+    const bounds = await panel.boundingBox();
+    for (const target of [inputFor(page), toggle, page.locator("#courseChatClose")]) {
+      const box = await target.boundingBox();
+      assert.ok(box && box.x >= bounds.x && box.x + box.width <= bounds.x + bounds.width + 1 &&
+        box.y >= bounds.y && box.y + box.height <= bounds.y + bounds.height + 1, JSON.stringify({ bounds, box }));
+    }
+    const rail = page.locator("#courseChatRail");
+    assert.equal(await rail.isVisible(), railVisible);
+    if (railVisible) {
+      const left = await rail.boundingBox();
+      const main = await page.locator("#courseChatWelcome").boundingBox();
+      assert.ok(left.x + left.width <= main.x + 1, JSON.stringify({ left, main }));
+    }
+    const suggestions = page.locator(".course-chat-suggestions button");
+    assert.equal(await suggestions.count(), 4);
+    await suggestions.last().click();
+    assert.equal(await inputFor(page).inputValue(), "زمان و شهریهٔ دوره اعلام شده؟");
+    assert.equal(calls.length, 0);
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth));
+    assert.deepEqual(errors, []);
+  });
+}
+
+test("the new launcher and Focused view pass axe in the light and dark palettes", { skip: engine !== "chromium" }, async (t) => {
+  for (const theme of ["dark", "light"]) {
+    const { page } = await pageFor(t, { theme, width: 1440, height: 900 });
+    await page.addScriptTag({ content: axe.source });
+    const audit = async (state) => {
+      const violations = await page.evaluate(async () => {
+        const report = await window.axe.run({ runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"] } });
+        return report.violations.filter(issue => ["serious", "critical"].includes(issue.impact))
+          .map(issue => ({ id: issue.id, targets: issue.nodes.map(node => node.target) }));
+      });
+      assert.deepEqual(violations, [], JSON.stringify({ theme, state, violations }));
+    };
+    await audit("launcher");
+    await openChat(page);
+    await page.locator("#courseChatVariant").click();
+    await audit("focused");
+  }
+});
+
+test("Focused keeps its input, pending stop and layout switch reachable above a mobile keyboard", async (t) => {
+  const held = gate();
+  t.after(() => held.resume());
+  const { page, calls } = await pageFor(t, { width: 320, height: 568, response: async () => {
+    await held.waiting;
+    return { json: { answer: defaultAnswer } };
+  } });
+  await openChat(page);
+  const variant = page.locator("#courseChatVariant");
+  await variant.click();
+  await ask(page, "پرسش نخست");
+  const stop = page.locator("#courseChatStop");
+  await visible(stop);
+  const draft = "پیش‌نویس سؤال بعدی ".repeat(15);
+  await inputFor(page).fill(draft);
+  await page.evaluate(() => {
+    Object.defineProperties(visualViewport, {
+      height: { configurable: true, value: 280 },
+      offsetTop: { configurable: true, value: 0 },
+    });
+    visualViewport.dispatchEvent(new Event("resize"));
+  });
+  await page.waitForFunction(() => document.querySelector(".course-chat").style.getPropertyValue("--chat-viewport-height") === "280px");
+  for (const control of [inputFor(page), stop, page.locator("#courseChatClose"), variant]) {
+    const box = await control.boundingBox();
+    assert.ok(box && box.y >= 0 && box.y + box.height <= 280, JSON.stringify(box));
+  }
+  assert.equal(await inputFor(page).inputValue(), draft);
+  await stop.click();
+  await visible(page.locator(".course-chat-failure"));
+  assert.equal(calls.length, 1);
+  assert.equal(await inputFor(page).inputValue(), draft);
+});

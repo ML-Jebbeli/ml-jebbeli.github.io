@@ -1,0 +1,18 @@
+{
+  "attribute:#courseChatLaunchAction:span:id[1]": "4e06c389fa0708ce7cd0ec85b8163171db4cc58720919f3e42ca5ee2b507ada9",
+  "attribute:#courseChatLinksTitle:p:id[1]": "3a8703e6a78c03a9458efa144f46dfdefbe5f7b5cbe8e72e82dc5d43b6a0cef6",
+  "attribute:#courseChatRail/nav/a:#course:a:href[1]": "26f496f54c99183ce87962e42588ea9cd93998840b8a17998df8848583def52f",
+  "attribute:#courseChatRail/nav/a:#resources:a:href[1]": "14ddf45e07b0f1c368f795bcac636829ec4c646808d95b1e0815f6aadc4dedb3",
+  "attribute:#courseChatRail/nav/a:https://t.me/Iustech_support:a:href[1]": "43d02e0b329ecad1a6d239950ec204cbccd46712aca50ac26a2a37338185e5d9",
+  "attribute:#courseChatRail/nav:nav:aria-labelledby[1]": "3a8703e6a78c03a9458efa144f46dfdefbe5f7b5cbe8e72e82dc5d43b6a0cef6",
+  "attribute:#courseChatRail:aside:id[1]": "4d6c8b4f3ca87cf0c582cfec80323d5382c21e86ad9cc631fd88a632db3df266",
+  "attribute:#courseChatRecent:div:id[1]": "8f48f56e01baaef0a5fea97132b0335c22c088df1df7f2b3432ac99d7a4ef69b",
+  "attribute:#courseChatVariant:button:id[1]": "11d333f1f0da88ea3c953f4daa9c0d5308340480126fc3d9d965bab9962e2df8",
+  "text:#courseChatLaunchAction[1]": "eb39ed7dd8f6461a7ee110fe67334d73e5d6245b5f1379b352cc4c4c8877f5a4",
+  "text:#courseChatLinksTitle[1]": "cd063ebca25e86e954f4aabe541d7ef546cc4d21e99f16885b8bb7ab07b1b37f",
+  "text:#courseChatRail/nav/a:#course[1]": "bf6f6278d2df0eee9a98c239b13cce22d37ee21b05c79415b48ee634f909bfd3",
+  "text:#courseChatRail/nav/a:#resources[1]": "885c8471ca138899df193545db439ab2177df8c54963e2174300a4956c067056",
+  "text:#courseChatRail/nav/a:https://t.me/Iustech_support[1]": "5585e73efb615c2d889d28b03f79843d68217afeb27f7893e76ad9c09b46bea7",
+  "text:#courseChatRecent[1]": "2697d080c0788409e290705183a6fe8bc1b99d19b1317825ba7922f9a7072266",
+  "text:#courseChatVariant[1]": "ee406e45e2f98ee84a4f04e327e7f33454ba8561ea8eb44137457b7b4aba2200"
+}
