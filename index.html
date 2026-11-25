@@ -11,15 +11,44 @@
 <meta name="theme-color" content="#080b14" id="metaTheme" />
 
 <!-- Favicon -->
-<link rel="icon" type="image/jpeg" href="ax.png" />
-<link rel="apple-touch-icon" href="ax.png" />
+<link rel="canonical" href="https://ml-jebbeli.github.io/" />
+<link rel="icon" type="image/png" href="assets/favicon.png" />
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
 
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
 <meta property="og:locale" content="fa_IR" />
 <meta property="og:title" content="دوره یادگیری ماشین — امیر جبلی" />
 <meta property="og:description" content="از مبانی ریاضی تا پیاده‌سازی مدل‌ها با PyTorch. یک مسیر آموزشی عمیق و پروژه‌محور برای یادگیری Machine Learning." />
-<meta property="og:image" content="amir-jebeli.jpg" />
+<meta property="og:url" content="https://ml-jebbeli.github.io/" />
+<meta property="og:image" content="https://ml-jebbeli.github.io/amir-jebeli.jpg" />
+<meta property="og:image:alt" content="امیر جبلی، مدرس دورهٔ یادگیری ماشین" />
+<meta name="twitter:image" content="https://ml-jebbeli.github.io/amir-jebeli.jpg" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Course",
+      "@id": "https://ml-jebbeli.github.io/#course",
+      "name": "دورهٔ یادگیری ماشین",
+      "description": "یادگیری ماشین از مبانی ریاضی و الگوریتم‌ها تا پیاده‌سازی مدل‌ها با PyTorch و آمادگی برای مطالعهٔ مقالات علمی.",
+      "url": "https://ml-jebbeli.github.io/#course",
+      "inLanguage": "fa",
+      "provider": {"@id": "https://ml-jebbeli.github.io/#instructor"}
+    },
+    {
+      "@type": "Person",
+      "@id": "https://ml-jebbeli.github.io/#instructor",
+      "name": "سید امیرحسین حسینی جبلی",
+      "alternateName": "امیر جبلی",
+      "url": "https://ml-jebbeli.github.io/#instructor",
+      "image": "https://ml-jebbeli.github.io/amir-jebeli.jpg",
+      "sameAs": "https://www.youtube.com/@iustech"
+    }
+  ]
+}
+</script>
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="دوره یادگیری ماشین — امیر جبلی" />
 <meta name="twitter:description" content="از مبانی ریاضی تا پیاده‌سازی مدل‌ها با PyTorch." />
@@ -29,18 +58,14 @@
 (function(){
   try{
     var t=localStorage.getItem('theme');
-    if(!t){t='dark';}
+    t=t==='light'?'light':'dark';
     document.documentElement.setAttribute('data-theme',t);
     var m=document.getElementById('metaTheme'); if(m) m.setAttribute('content', t==='light'?'#f8fafc':'#080b14');
   }catch(e){}
 })();
 </script>
 
-<!-- Persian Font -->
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-
+<link rel="preload" href="assets/fonts/vazirmatn-arabic-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
 <style>
 /* ============ THEME VARIABLES ============ */
 /* Dark (default) */
@@ -91,7 +116,7 @@
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{
   font-family:var(--font); background:var(--bg); color:var(--fg);
-  line-height:1.55; overflow-x:hidden; -webkit-font-smoothing:antialiased;
+  line-height:1.7; -webkit-font-smoothing:antialiased;
   transition:background .4s ease,color .4s ease;
 }
 ::selection{background:rgba(56,189,248,.3);color:#fff}
@@ -163,7 +188,6 @@ section{position:relative;padding:3.25rem 0}
 .nav-logo-text .name{font-size:.8rem;font-weight:700;color:var(--fg)}
 .nav-logo-text .sub{font-size:.625rem;color:var(--cyan)}
 .nav-links{display:none;align-items:center;gap:.15rem;list-style:none}
-@media(min-width:1024px){.nav-links{display:flex}}
 .nav-link{position:relative;padding:.4rem .75rem;font-size:.82rem;border-radius:.5rem;transition:color .3s;color:var(--fg-muted)}
 .nav-link:hover{color:var(--fg)}
 .nav-link.active{color:var(--cyan)}
@@ -172,7 +196,6 @@ section{position:relative;padding:3.25rem 0}
 .nav-cta{display:none}
 @media(min-width:640px){.nav-cta{display:inline-flex}}
 .nav-toggle{display:grid;place-items:center;width:2.25rem;height:2.25rem;border-radius:.5rem;background:var(--glass);backdrop-filter:blur(14px);color:var(--fg);border:1px solid var(--border)}
-@media(min-width:1024px){.nav-toggle{display:none}}
 .nav-toggle svg{width:1.1rem;height:1.1rem}
 
 /* theme toggle */
@@ -183,16 +206,6 @@ section{position:relative;padding:3.25rem 0}
 .theme-toggle .icon-moon{display:block}
 :root[data-theme="light"] .theme-toggle .icon-sun{display:block}
 :root[data-theme="light"] .theme-toggle .icon-moon{display:none}
-
-/* mobile menu */
-.mobile-menu{position:fixed;inset:0;z-index:99;display:none}
-.mobile-menu.open{display:block}
-.mobile-menu-bg{position:absolute;inset:0;background:rgba(2,6,23,.7);backdrop-filter:blur(14px)}
-:root[data-theme="light"] .mobile-menu-bg{background:rgba(15,23,42,.4)}
-.mobile-menu-panel{position:absolute;top:0;right:0;bottom:0;width:78%;max-width:22rem;background:var(--glass-strong);backdrop-filter:blur(18px);border-left:1px solid var(--border);padding:4.5rem 1.25rem 1.25rem;display:flex;flex-direction:column;gap:.4rem;transform:translateX(100%);transition:transform .3s cubic-bezier(.16,1,.3,1)}
-.mobile-menu.open .mobile-menu-panel{transform:translateX(0)}
-.mobile-menu-link{text-align:right;padding:.7rem .875rem;border-radius:.625rem;font-size:.95rem;font-weight:500;color:var(--fg-muted);transition:all .3s;border:1px solid transparent}
-.mobile-menu-link:hover,.mobile-menu-link.active{background:var(--input-bg);color:var(--cyan);border-color:rgba(56,189,248,.2)}
 
 /* ============ HERO (compact) ============ */
 .hero{min-height:100vh;display:flex;align-items:center;padding:5rem 0 3rem;overflow:hidden}
@@ -231,7 +244,7 @@ section{position:relative;padding:3.25rem 0}
 .photo-border{position:relative;border-radius:1.1rem;padding:1.5px;background:linear-gradient(135deg,rgba(56,189,248,.5),rgba(139,92,246,.4),transparent)}
 .photo-inner{position:relative;border-radius:1.05rem;overflow:hidden;background:var(--glass-strong);backdrop-filter:blur(18px);border:1px solid var(--border-strong)}
 .photo-box{position:relative;aspect-ratio:4/5;width:100%;background:var(--bg-soft)}
-.photo-box img{width:100%;height:100%;object-fit:cover;-webkit-user-drag:none;user-drag:none}
+.photo-box img{width:100%;height:100%;object-fit:cover;-webkit-user-drag:none}
 .photo-fallback{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:var(--fg-dim)}
 .photo-fallback .avatar{width:3.5rem;height:3.5rem;border-radius:999px;background:linear-gradient(135deg,rgba(56,189,248,.2),rgba(139,92,246,.2));border:1px solid rgba(56,189,248,.3);display:grid;place-items:center}
 .photo-fallback .avatar span{font-size:1rem;font-weight:700;color:var(--cyan)}
@@ -374,10 +387,10 @@ section{position:relative;padding:3.25rem 0}
 .inst-badge{position:absolute;bottom:-.6rem;left:50%;transform:translateX(-50%);white-space:nowrap;padding:.25rem .55rem;border-radius:999px;background:var(--glass-strong);backdrop-filter:blur(18px);border:1px solid rgba(52,211,153,.3);font-size:.6rem;color:var(--badge-fg);display:flex;align-items:center;gap:.3rem}
 .inst-badge svg{width:.75rem;height:.75rem}
 .inst-info .eyebrow{color:var(--cyan);font-size:.8rem;font-weight:600;margin-bottom:.35rem}
-.inst-info h2{font-size:1.25rem;font-weight:700;color:var(--fg)}
-@media(min-width:640px){.inst-info h2{font-size:1.65rem}}
-.inst-info h2 .sub{display:block;margin-top:.15rem;font-size:1rem}
-@media(min-width:640px){.inst-info h2 .sub{font-size:1.15rem}}
+.inst-info h3{font-size:1.25rem;font-weight:700;color:var(--fg)}
+@media(min-width:640px){.inst-info h3{font-size:1.65rem}}
+.inst-info h3 .sub{display:block;margin-top:.15rem;font-size:1rem}
+@media(min-width:640px){.inst-info h3 .sub{font-size:1.15rem}}
 .inst-info .bio{margin-top:.625rem;color:var(--fg-muted);font-size:.875rem;max-width:38rem}
 @media(min-width:640px){.inst-info .bio{font-size:.95rem}}
 .inst-yt-btn{margin-top:1rem;display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1rem;border-radius:.625rem;font-weight:600;font-size:.82rem;color:#fff;background:linear-gradient(to right,#f43f5e,#e11d48);box-shadow:0 6px 22px -8px rgba(244,63,94,.55);transition:all .3s}
@@ -578,70 +591,50 @@ section{position:relative;padding:3.25rem 0}
 .float-tg::before{content:"";position:absolute;inset:0;border-radius:999px;background:rgba(56,189,248,.4);animation:ping 2s infinite}
 .float-tg svg{position:relative;width:1.25rem;height:1.25rem}
 
-/* ============ LIGHTBOX ============ */
-.lightbox{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,.92);backdrop-filter:blur(8px)}
-:root[data-theme="light"] .lightbox{background:rgba(15,23,42,.75)}
-.lightbox.open{display:flex}
-.lb-inner{position:relative;max-width:90vw;max-height:88vh;display:flex;align-items:center;justify-content:center}
-.lb-img{max-width:90vw;max-height:82vh;border-radius:.5rem;object-fit:contain;box-shadow:0 20px 60px -10px rgba(0,0,0,.7);-webkit-user-drag:none;pointer-events:none}
-.lb-close{position:absolute;top:1rem;right:1rem;display:grid;place-items:center;width:2.5rem;height:2.5rem;border-radius:999px;background:rgba(255,255,255,.1);backdrop-filter:blur(8px);color:#fff;border:1px solid rgba(255,255,255,.2);transition:all .3s;z-index:5}
-.lb-close:hover{background:rgba(244,63,94,.8);transform:rotate(90deg)}
-.lb-close svg{width:1.25rem;height:1.25rem}
-.lb-nav{position:absolute;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:2.75rem;height:2.75rem;border-radius:999px;background:rgba(255,255,255,.1);backdrop-filter:blur(8px);color:#fff;border:1px solid rgba(255,255,255,.2);transition:all .3s;z-index:5}
-.lb-nav:hover{background:rgba(56,189,248,.6)}
-.lb-nav svg{width:1.25rem;height:1.25rem}
-.lb-prev{left:.75rem}
-.lb-next{right:.75rem}
-.lb-cap{position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);padding:.4rem .75rem;border-radius:.5rem;background:rgba(2,6,23,.6);backdrop-filter:blur(8px);color:#fff;font-size:.78rem;font-weight:500;max-width:80vw;text-align:center}
-:root[data-theme="light"] .lb-cap{background:rgba(255,255,255,.8);color:#0f172a}
-@media(max-width:639px){.lb-nav{width:2.25rem;height:2.25rem}.lb-prev{left:.4rem}.lb-next{right:.4rem}.lb-close{top:.5rem;right:.5rem;width:2.25rem;height:2.25rem}}
-
-/* ============ VIDEO MODAL ============ */
-.video-modal{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,.92);backdrop-filter:blur(8px);padding:1rem}
-:root[data-theme="light"] .video-modal{background:rgba(15,23,42,.75)}
-.video-modal.open{display:flex}
-.vm-inner{position:relative;max-width:56rem;width:100%}
-.vm-video{width:100%;border-radius:.75rem;box-shadow:0 20px 60px -10px rgba(0,0,0,.7);background:#000;display:block}
-.vm-close{position:absolute;top:-.5rem;right:-.5rem;display:grid;place-items:center;width:2.5rem;height:2.5rem;border-radius:999px;background:rgba(244,63,94,.9);color:#fff;border:2px solid rgba(255,255,255,.2);transition:all .3s;z-index:5}
-@media(max-width:639px){.vm-close{top:.25rem;right:.25rem}}
-.vm-close:hover{transform:rotate(90deg)}
-.vm-close svg{width:1.25rem;height:1.25rem}
-
 /* ============ ANIMATIONS ============ */
 @keyframes ping{0%{transform:scale(1);opacity:1}75%,100%{transform:scale(2);opacity:0}}
 @keyframes pulse-glow{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:1;transform:scale(1.04)}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
-.reveal{transform:translateY(22px);transition:transform .6s cubic-bezier(.16,1,.3,1)}
-.reveal.visible{transform:translateY(0)}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
   .reveal{transform:none}
   .intro-pill .dot::before,.stage-node .ring,.float-tg::before,.video-play::before{animation:none!important}
 }
 </style>
-<link rel="stylesheet" href="course-chat.css" />
+<link rel="stylesheet" href="site.css" />
+<link rel="stylesheet" href="course-chat.css?v=2" />
+<noscript><style>
+  @media (max-width: 71.999rem) {
+    .navbar { position: static; background: var(--bg-card); }
+    .navbar .nav-inner { flex-wrap: wrap; height: auto; padding-block: .4rem; }
+    .navbar .nav-links { display: flex; flex-wrap: wrap; }
+    .navbar .nav-fallback { display: none; }
+    .hero { padding-block-start: 1.25rem; }
+  }
+</style></noscript>
 </head>
 <body>
+<a class="skip-link" href="#mainContent">رفتن به محتوای اصلی</a>
 
 <!-- ============ NAVBAR ============ -->
 <header class="navbar" id="navbar">
   <div class="container">
-    <nav class="nav-inner">
-      <button class="nav-logo" onclick="scrollTo('home')" aria-label="خانه — امیر جبلی">
-        <span class="nav-logo-icon"><img src="ax.png" alt="لوگو امیر جبلی" onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#38bdf8,#8b5cf6)'" /></span>
-        <span class="nav-logo-text"><span class="name">Amir Jebbeli</span><span class="sub ltr">Machine Learning</span></span>
-      </button>
+    <nav class="nav-inner" aria-label="پیمایش اصلی">
+      <a class="nav-logo" href="#home">
+        <span class="nav-logo-icon"><img src="assets/iustech-64.webp" srcset="assets/iustech-64.webp 1x, assets/iustech-128.webp 2x" width="64" height="64" alt="" /></span>
+        <span class="nav-logo-text" lang="en" dir="ltr"><span class="name">Amir Jebbeli</span><span class="sub ltr">Machine Learning</span></span>
+      </a>
       <ul class="nav-links" id="navLinks">
-        <li><button class="nav-link" data-target="home">خانه</button></li>
-        <li><button class="nav-link" data-target="course">درباره دوره</button></li>
-        <li><button class="nav-link" data-target="journey">مسیر یادگیری</button></li>
-        <li><button class="nav-link" data-target="instructor">مدرس</button></li>
-        <li><button class="nav-link" data-target="resources">منابع رایگان</button></li>
-        <li><button class="nav-link" data-target="faq">سؤالات متداول</button></li>
+        <li><a class="nav-link" href="#home">خانه</a></li>
+        <li><a class="nav-link" href="#course">درباره دوره</a></li>
+        <li><a class="nav-link" href="#journey">مسیر یادگیری</a></li>
+        <li><a class="nav-link" href="#instructor">مدرس</a></li>
+        <li><a class="nav-link" href="#resources">منابع رایگان</a></li>
+        <li><a class="nav-link" href="#faq">سؤالات متداول</a></li>
       </ul>
       <div class="nav-actions">
-        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="تغییر تم">
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="تم روشن" aria-pressed="false" hidden>
           <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
           <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
         </button>
@@ -649,7 +642,10 @@ section{position:relative;padding:3.25rem 0}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.9369 12.9104 18.5709 9.27638C19.0991 8.74812 19.0991 7.88916 18.5709 7.3609L15.4826 4.27262C14.9543 3.74436 14.0954 3.74436 13.5671 4.27262L6.07086 11.7689M14.9369 12.9104 7.42909 20.4083C6.90083 20.9365 6.04187 20.9365 5.51361 20.4083L4.42931 19.324C3.90105 18.7957 3.90105 17.9368 4.42931 17.4085L11.9271 9.91075M14.9369 12.9104 11.9271 9.91075"/></svg>
           اعلام علاقه‌مندی
         </a>
-        <button class="nav-toggle" id="navToggle" aria-label="باز کردن منو" aria-expanded="false">
+        <a class="nav-fallback" href="#siteNavigation" aria-label="فهرست پیمایش">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </a>
+        <button class="nav-toggle" id="navToggle" type="button" aria-label="باز کردن منو" aria-controls="mobileMenu" aria-haspopup="dialog" aria-expanded="false" hidden>
           <svg id="navIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
         </button>
       </div>
@@ -658,25 +654,29 @@ section{position:relative;padding:3.25rem 0}
 </header>
 
 <!-- Mobile menu -->
-<div class="mobile-menu" id="mobileMenu">
-  <div class="mobile-menu-bg" onclick="closeMenu()"></div>
+<dialog class="mobile-menu" id="mobileMenu" aria-labelledby="mobileMenuTitle">
   <div class="mobile-menu-panel">
-    <button class="mobile-menu-link" data-target="home">خانه</button>
-    <button class="mobile-menu-link" data-target="course">درباره دوره</button>
-    <button class="mobile-menu-link" data-target="journey">مسیر یادگیری</button>
-    <button class="mobile-menu-link" data-target="instructor">مدرس</button>
-    <button class="mobile-menu-link" data-target="resources">منابع رایگان</button>
-    <button class="mobile-menu-link" data-target="faq">سؤالات متداول</button>
-    <a class="btn btn-primary" style="margin-top:.75rem" href="https://t.me/Iustech_support" target="_blank" rel="noopener noreferrer">اعلام علاقه‌مندی به دوره 🚀</a>
+    <div class="dialog-header"><h2 id="mobileMenuTitle">پیمایش سایت</h2>
+      <button class="dialog-button" type="button" data-close aria-label="بستن منو"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+    </div>
+    <nav class="mobile-menu-links" aria-labelledby="mobileMenuTitle">
+      <a class="mobile-menu-link" href="#home">خانه</a>
+      <a class="mobile-menu-link" href="#course">درباره دوره</a>
+      <a class="mobile-menu-link" href="#journey">مسیر یادگیری</a>
+      <a class="mobile-menu-link" href="#instructor">مدرس</a>
+      <a class="mobile-menu-link" href="#resources">منابع رایگان</a>
+      <a class="mobile-menu-link" href="#faq">سؤالات متداول</a>
+    </nav>
+    <a class="btn btn-primary" href="https://t.me/Iustech_support" target="_blank" rel="noopener noreferrer">اعلام علاقه‌مندی به دوره 🚀</a>
   </div>
-</div>
+</dialog>
 
-<main>
+<main id="mainContent" tabindex="-1">
 <!-- ============ HERO ============ -->
 <section class="hero" id="home">
   <div class="bg-grid hero-grid"></div>
   <div class="hero-radial"></div>
-  <canvas class="hero-canvas" id="heroCanvas"></canvas>
+  <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
   <div class="hero-fade"></div>
   <div class="container">
     <div class="hero-content">
@@ -706,7 +706,7 @@ section{position:relative;padding:3.25rem 0}
         <div class="photo-frame">
           <div class="photo-glow"></div>
           <div class="photo-border"><div class="photo-inner"><div class="photo-box">
-            <img src="amir-jebeli.jpg" alt="امیر جبلی — مدرس دوره یادگیری ماشین" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+            <img src="assets/instructor-320.webp" srcset="assets/instructor-320.webp 320w, assets/instructor-640.webp 640w" sizes="(min-width: 75rem) 18rem, (min-width: 43rem) 24vw, 10.25rem" alt="امیر جبلی — مدرس دوره یادگیری ماشین" width="640" height="640" fetchpriority="high" decoding="async" data-portrait />
             <div class="photo-fallback"><div class="avatar"><span>AJ</span></div><span>امیر جبلی</span></div>
             <div class="photo-overlay"></div><div class="photo-scanline"></div>
           </div>
@@ -716,13 +716,13 @@ section{position:relative;padding:3.25rem 0}
           </div></div></div></div>
           <span class="photo-corner tl"></span><span class="photo-corner br"></span>
         </div>
-        <div class="code-window" id="codeWindow" style="display:none">
+        <div class="code-window" id="codeWindow" aria-hidden="true">
           <div class="code-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="name">mlp_torch.py</span><span class="tag ltr">PyTorch</span></div>
-          <div class="code-body" id="codeBody"></div>
+          <div class="code-body" dir="ltr"><div class="code-line"><span class="ln">1</span><span class="kw">import torch</span></div><div class="code-line"><span class="ln">2</span><span class="kw">import torch.nn as nn</span></div><div class="code-line"><span class="ln">3</span><span class=""> </span></div><div class="code-line"><span class="ln">4</span><span class="def">class MLP(nn.Module):</span></div><div class="code-line"><span class="ln">5</span><span class="def">    def __init__(self, in_dim, hid, out_dim):</span></div><div class="code-line"><span class="ln">6</span><span class="plain">        super().__init__()</span></div><div class="code-line"><span class="ln">7</span><span class="plain">        self.net = nn.Sequential(</span></div><div class="code-line"><span class="ln">8</span><span class="fn">            nn.Linear(in_dim, hid),</span></div><div class="code-line"><span class="ln">9</span><span class="fn">            nn.ReLU(),</span></div><div class="code-line"><span class="ln">10</span><span class="fn">            nn.Linear(hid, out_dim),</span></div><div class="code-line"><span class="ln">11</span><span class="plain">        )</span></div><div class="code-line"><span class="ln">12</span><span class=""> </span></div><div class="code-line"><span class="ln">13</span><span class="def">    def forward(self, x):</span></div><div class="code-line"><span class="ln">14</span><span class="plain">        return self.net(x)</span></div><div class="code-line"><span class="ln">15</span><span class=""> </span></div><div class="code-line"><span class="ln">16</span><span class="plain">model = MLP(784, 128, 10)</span></div><div class="code-line"><span class="ln">17</span><span class="plain">loss_fn = nn.CrossEntropyLoss()</span></div></div>
         </div>
       </div>
     </div>
-    <button class="scroll-hint" onclick="scrollTo('course')" aria-label="پایین صفحه"><span style="font-size:.62rem">اسکرول کن</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg></button>
+    <a class="scroll-hint" href="#course" aria-label="دربارهٔ دوره"><span style="font-size:.62rem">اسکرول کن</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg></a>
   </div>
 </section>
 
@@ -731,10 +731,10 @@ section{position:relative;padding:3.25rem 0}
   <div class="container">
     <div class="sec-head reveal"><p class="eyebrow" style="color:var(--cyan)">اعتماد و سابقه</p><h2>تا اینجا چه مسیری طی شده</h2><p>این اعداد از دوره‌ها و تدریس‌های گذشته‌م هستن، نه آمار ثبت‌نام دوره پیش‌رو.</p></div>
     <div class="stats-grid">
-      <div class="card stat-card reveal"><div class="stat-top"><div class="stat-val"><span class="prefix">حدود </span><span class="num tnum" data-target="100">۰</span><span class="label">ثبت‌نام</span></div><div class="stat-icon ic-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div></div><p class="desc">دوره پایتون تابستان ۱۴۰۳</p></div>
-      <div class="card stat-card reveal"><div class="stat-top"><div class="stat-val"><span class="prefix">بیش از </span><span class="num tnum" data-target="130">۰</span><span class="label">دانشجو</span></div><div class="stat-icon ic-violet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div></div><p class="desc">تدریس Python و ++C در کوئرا</p></div>
-      <div class="card stat-card reveal"><div class="stat-top"><div class="stat-val"><span class="num tnum" data-target="25">۰</span><span class="label">جلسه</span></div><div class="stat-icon ic-emerald"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/></svg></div></div><p class="desc">دوره قبلی مبانی AI و ML برای ۶۰ دانشجو</p></div>
-      <div class="card stat-card reveal"><div class="stat-top"><div class="stat-val"><span class="num tnum" data-target="7">۰</span><span class="label">ترم</span></div><div class="stat-icon ic-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4.602A6.5 6.5 0 0 0 3.708 9.49a6.5 6.5 0 0 0 2.294 8.114L6 18"/><path d="M14 19.398A6.5 6.5 0 0 0 22 16.5"/></svg></div></div><p class="desc">تحصیل ریاضیات قبل از مهندسی کامپیوتر</p></div>
+      <div class="card stat-card reveal"><div class="stat-top"><div class="stat-val"><span class="prefix">حدود </span><span class="num tnum" data-target="100">۱۰۰</span><span class="label">ثبت‌نام</span></div><div class="stat-icon ic-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div></div><p class="desc">دوره پایتون تابستان ۱۴۰۳</p></div>
+      <div class="card stat-card reveal"><div class="stat-top"><div class="stat-val"><span class="prefix">بیش از </span><span class="num tnum" data-target="130">۱۳۰</span><span class="label">دانشجو</span></div><div class="stat-icon ic-violet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div></div><p class="desc">تدریس Python و ++C در کوئرا</p></div>
+      <div class="card stat-card reveal"><div class="stat-top"><div class="stat-val"><span class="num tnum" data-target="25">۲۵</span><span class="label">جلسه</span></div><div class="stat-icon ic-emerald"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/></svg></div></div><p class="desc">دوره قبلی مبانی AI و ML برای ۶۰ دانشجو</p></div>
+      <div class="card stat-card reveal"><div class="stat-top"><div class="stat-val"><span class="num tnum" data-target="7">۷</span><span class="label">ترم</span></div><div class="stat-icon ic-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4.602A6.5 6.5 0 0 0 3.708 9.49a6.5 6.5 0 0 0 2.294 8.114L6 18"/><path d="M14 19.398A6.5 6.5 0 0 0 22 16.5"/></svg></div></div><p class="desc">تحصیل ریاضیات قبل از مهندسی کامپیوتر</p></div>
     </div>
   </div>
 </section>
@@ -745,19 +745,25 @@ section{position:relative;padding:3.25rem 0}
   <div class="container" style="position:relative">
     <div class="sec-head reveal"><p class="eyebrow" style="color:var(--cyan)">دو پایه آموزشی</p><h2>مهندسی واقعی + مبانی علمی عمیق</h2><p>دوره روی دو پایه ساخته شده: پیاده‌سازی عملی و درک تئوری. هر دو با هم.</p></div>
     <div class="pillars-grid">
-      <div class="pillar active-cyan" id="pillarEng" onmouseenter="setActivePillar('eng')"><div class="pillar-inner"><div class="pillar-blob left cyan"></div><div style="position:relative">
+      <div class="pillar active-cyan" id="pillarEng"><div class="pillar-inner"><div class="pillar-blob left cyan"></div><div style="position:relative">
         <div class="pillar-head"><span class="pillar-tag cyan ltr">Track 01 — Engineering</span><div class="pillar-icon ic-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div></div>
         <h3>فقط یاد نمی‌گیری؛ پیاده‌سازی می‌کنی.</h3>
         <p class="pillar-desc">با پایتون و PyTorch مفاهیم یادگیری ماشین رو به کد تبدیل می‌کنیم، الگوریتم‌ها رو از پایه پیاده‌سازی می‌کنیم و سراغ پروژه‌هایی می‌ریم که مهارت‌های کاربردی می‌سازن.</p>
         <div class="pillar-motifs"><span class="chip-mono ltr">nn.Linear()</span><span class="chip-mono ltr">ReLU</span><span class="chip-mono ltr">backprop</span><span class="chip-mono ltr">torch.optim</span></div>
         <div class="pillar-visual"><div class="code-block"><div><span class="kw">for</span> epoch <span class="kw">in</span> range(epochs):</div><div style="padding-left:1rem">&nbsp;&nbsp;pred = model(x) <span style="color:var(--fg-dim)"># forward</span></div><div style="padding-left:1rem">&nbsp;&nbsp;loss = loss_fn(pred, y)</div><div style="padding-left:1rem">&nbsp;&nbsp;loss.backward()</div><div style="padding-left:1rem">&nbsp;&nbsp;optimizer.step()</div></div></div>
       </div></div></div>
-      <div class="pillar" id="pillarSci" onmouseenter="setActivePillar('sci')"><div class="pillar-inner"><div class="pillar-blob right violet"></div><div style="position:relative">
+      <div class="pillar" id="pillarSci"><div class="pillar-inner"><div class="pillar-blob right violet"></div><div style="position:relative">
         <div class="pillar-head"><span class="pillar-tag violet ltr">Track 02 — Scientific Foundations</span><div class="pillar-icon ic-violet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 3h15M6.5 8.5h11M7.5 14h9M9 19.5h6"/></svg></div></div>
         <h3>فقط از مدل استفاده نمی‌کنی؛ می‌فهمی چرا کار می‌کنه.</h3>
         <p class="pillar-desc">ریاضیات، آمار، بهینه‌سازی و مبانی علمی الگوریتم‌ها رو بررسی می‌کنیم تا مدل‌ها رو عمیق‌تر درک کنیم و با پشتوانه علمی سراغ مقالات پژوهشی بریم.</p>
         <div class="pillar-motifs"><span class="chip-mono ltr">∇f(x)</span><span class="chip-mono ltr">P(y|x)</span><span class="chip-mono ltr">argmin</span><span class="chip-mono ltr">∂L/∂w</span></div>
-        <div class="pillar-visual"><div style="display:flex;align-items:center;gap:.75rem"><div class="code-block" style="flex-shrink:0">w ← w − η∇L(w)</div><div style="flex:1" id="lossCurveWrap"></div></div></div>
+        <div class="pillar-visual"><div style="display:flex;align-items:center;gap:.75rem"><div class="code-block" style="flex-shrink:0">w ← w − η∇L(w)</div><div class="loss-curve" id="lossCurveWrap">
+          <svg viewBox="0 0 200 85" role="img" aria-label="نمودار تزئینی نزول تابع هزینه">
+            <path d="M8 9v67h185M8 53h185M8 30h185" stroke="var(--border-strong)" fill="none"/>
+            <path d="M10 15c30 1 26 41 75 49s76 7 103 8" stroke="var(--violet)" stroke-width="2" fill="none"/>
+            <circle cx="188" cy="72" r="3" fill="var(--violet)"/>
+          </svg>
+        </div></div></div>
       </div></div></div>
     </div>
     <div class="principle reveal"><div class="principle-glow"></div><div class="principle-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(180deg)"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg><span class="ltr">principle</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></div><p>«نه صرفا کدنویسی بدون فهم تئوری؛<br class="br"> <span class="grad-cyan">نه صرفا ریاضی بدون کاربرد عملی.</span>»</p></div>
@@ -772,7 +778,50 @@ section{position:relative;padding:3.25rem 0}
     <div style="position:relative" id="journeyWrap">
       <div class="journey-line mobile"><div class="journey-track"></div><div class="journey-fill" id="journeyFill"></div></div>
       <div class="journey-line desktop"><div class="journey-track"></div><div class="journey-fill" id="journeyFillD"></div></div>
-      <div class="journey-stages" id="stages"></div>
+      <div class="journey-stages" id="stages">
+        <article class="stage right">
+          <span class="stage-node" aria-hidden="true">۱</span>
+          <div class="stage-card">
+            <div class="stage-badges"><span class="stage-badge tag ltr">Stage 01</span><span class="stage-badge en ltr" lang="en">Python Basics</span></div>
+            <h3>شروع از صفر</h3><p>آشنایی با پایتون به‌عنوان زبان کار با داده و مدل‌ها.</p>
+          </div>
+        </article>
+        <article class="stage left">
+          <span class="stage-node" aria-hidden="true">۲</span>
+          <div class="stage-card">
+            <div class="stage-badges"><span class="stage-badge tag ltr">Stage 02</span><span class="stage-badge en ltr" lang="en">Linear Algebra · Calculus · Probability</span></div>
+            <h3>مبانی ریاضی</h3><p>بردارها، ماتریس‌ها، مشتق، بهینه‌سازی و احتمالات؛ زبان مشترک درک الگوریتم‌های یادگیری.</p>
+          </div>
+        </article>
+        <article class="stage right">
+          <span class="stage-node" aria-hidden="true">۳</span>
+          <div class="stage-card">
+            <div class="stage-badges"><span class="stage-badge tag ltr">Stage 03</span><span class="stage-badge en ltr" lang="en">Models &amp; Algorithms</span></div>
+            <h3>یادگیری ماشین</h3><p>از رگرسیون و درخت تصمیم تا مدل‌های مبتنی بر فاصله و شبکه‌های عصبی؛ چرا و چگونه کار می‌کنن.</p>
+          </div>
+        </article>
+        <article class="stage left">
+          <span class="stage-node" aria-hidden="true">۴</span>
+          <div class="stage-card">
+            <div class="stage-badges"><span class="stage-badge tag ltr">Stage 04</span><span class="stage-badge en ltr" lang="en">PyTorch</span></div>
+            <h3>پیاده‌سازی عملی</h3><p>ساخت مدل‌ها با PyTorch، آموزش، ارزیابی و دیباگ؛ از تعریف لایه تا حلقه آموزش.</p>
+          </div>
+        </article>
+        <article class="stage right">
+          <span class="stage-node" aria-hidden="true">۵</span>
+          <div class="stage-card">
+            <div class="stage-badges"><span class="stage-badge tag ltr">Stage 05</span><span class="stage-badge en ltr" lang="en">Practical Engineering</span></div>
+            <h3>پروژه و تحلیل</h3><p>سراغ پروژه‌های واقعی می‌ریم تا مهارت‌های مهندسی و تحلیلی برای ساخت مدل‌های کاربردی شکل بگیره.</p>
+          </div>
+        </article>
+        <article class="stage left">
+          <span class="stage-node" aria-hidden="true">۶</span>
+          <div class="stage-card">
+            <div class="stage-badges"><span class="stage-badge tag ltr">Stage 06</span><span class="stage-badge en ltr" lang="en">Reading ML Papers</span></div>
+            <h3>مطالعه پژوهشی</h3><p>با پشتوانه علمی، سراغ مطالعه مقالات یادگیری ماشین می‌ریم تا با زبان پژوهش آشنا بشیم.</p>
+          </div>
+        </article>
+      </div>
     </div>
     <div class="journey-disclaimer"><div class="disclaimer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg><p>سیلابس دقیق، زمان‌بندی و جزئیات اجرایی دوره به‌زودی اعلام می‌شه.</p></div></div>
   </div>
@@ -787,19 +836,44 @@ section{position:relative;padding:3.25rem 0}
 
     <div class="instructor-head reveal">
       <div class="inst-photo-wrap"><div class="inst-photo"><div class="inst-photo-glow"></div><div class="inst-photo-border"><div class="inst-photo-inner"><div class="inst-photo-box">
-        <img src="amir-jebeli.jpg" alt="سید امیرحسین حسینی جبلی (امیر جبلی)" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <img src="assets/instructor-320.webp" srcset="assets/instructor-320.webp 320w, assets/instructor-640.webp 640w" sizes="10rem" alt="سید امیرحسین حسینی جبلی (امیر جبلی)" width="640" height="640" loading="lazy" decoding="async" data-portrait />
         <div class="photo-fallback"><div class="avatar"><span>AJ</span></div><span>امیر جبلی</span></div>
         <div class="photo-overlay"></div>
       </div></div></div><div class="inst-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/></svg>مدرس کوئرا</div></div></div>
       <div class="inst-info">
-        <h2>سید امیرحسین حسینی جبلی <span class="sub grad-cyan">(امیر جبلی)</span></h2>
+        <h3>سید امیرحسین حسینی جبلی <span class="sub grad-cyan">(امیر جبلی)</span></h3>
         <p class="bio">سلام! فارغ‌التحصیل مهندسی کامپیوتر از دانشگاه علم و صنعت ایرانم. قبلش ۷ ترم ریاضیات خوندم و هرچی یاد گرفتم امروز تو درک عمیق‌تر یادگیری ماشین به‌کارم میاد. توی دانشگاه، دستیار آموزشی درس‌های مختلفی مثل یادگیری ماشین، یادگیری عمیق، هوش مصنوعی و پردازش زبان طبیعی بودم و الانم عاشق آموزش همین مفاهیمم.</p>
         <a class="inst-yt-btn" href="https://www.youtube.com/@iustech" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg>مشاهده آموزش‌های رایگان</a>
       </div>
     </div>
 
     
-<div class="achievements" id="achievements"></div>
+<div class="achievements" id="achievements">
+        <article class="card ach-card">
+          <div class="ach-head"><div class="ach-icon ic-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div><h3>تحصیلات</h3></div>
+          <ul class="ach-list"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>فارغ‌التحصیل مهندسی کامپیوتر، دانشگاه علم و صنعت ایران.</span></li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>قبلش ۷ ترم ریاضیات و کاربردها خوندم؛ این مقطع رو کامل نکردم و انصراف دادم، ولی علاقه‌م به ریاضی همیشه کمکم می‌کنه.</span></li></ul>
+        </article>
+        <article class="card ach-card">
+          <div class="ach-head"><div class="ach-icon ic-violet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3>تدریسیاری دانشگاه</h3></div>
+          <ul class="ach-list"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>دستیار ارشد (Head TA) درس‌های یادگیری عمیق، یادگیری ماشین، پردازش زبان طبیعی، هوش مصنوعی، هوش محاسباتی و شبکه‌های عصبی.</span></li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>دستیار آموزشی بینایی ماشین، سیستم‌های چندعامله</span></li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>تدریس جبرخطی موردنیاز یادگیری ماشین در چندین ترم</span></li></ul>
+        </article>
+        <article class="card ach-card">
+          <div class="ach-head"><div class="ach-icon ic-emerald"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6v4l4 7a3 3 0 0 1-2 5H7a3 3 0 0 1-2-5l4-7z"/></svg></div><h3>پژوهش</h3></div>
+          <ul class="ach-list"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>همکار پژوهشی در آزمایشگاه دکتر ناصر مزینی.</span></li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>علاقه‌مندی‌ام NLP، هوش مصنوعی چندوجهی، سیستم‌های هوشمند مبتنی بر صوت و یادگیری عمیقه.</span></li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>روی چند پروژه پژوهشی کار می‌کنم؛ هنوز در مراحل اولیه‌ست و مقاله‌ای منتشر نشده.</span></li></ul>
+        </article>
+        <article class="card ach-card">
+          <div class="ach-head"><div class="ach-icon ic-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/></svg></div><h3>تدریس عمومی</h3></div>
+          <ul class="ach-list"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Python و ++C رو به بیش از ۱۳۰ دانشجو با همکاری کوئرا تدریس کردم.</span></li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>مقدماتی هوش مصنوعی و یادگیری ماشین رو تو دوره‌ای ۲۵ جلسه‌ای به ۶۰ دانشجو آموزش دادم.</span></li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>کانال یوتیوبم پر از محتوای برنامه‌نویسی، ریاضیات و هوش مصنوعیه.</span></li></ul>
+        </article>
+        <article class="card ach-card">
+          <div class="ach-head"><div class="ach-icon ic-violet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/></svg></div><h3>جوایز و سوابق دیگر</h3></div>
+          <ul class="ach-list"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>دانشجویان من رو به‌عنوان دستیار آموزشی برتر گروه مهندسی کامپیوتر علم و صنعت انتخاب کردن، بین بیش از ۱۰۰ دستیار آموزشی.</span></li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>رئیس انجمن فارغ‌التحصیلان دانشگاه علم و صنعت ایران</span></li></ul>
+        </article>
+        <article class="card ach-card">
+          <div class="ach-head"><div class="ach-icon ic-emerald"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="4" height="16" x="4" y="4" rx="1"/><rect width="4" height="16" x="10" y="4" rx="1"/><rect width="4" height="16" x="16" y="4" rx="1"/></svg></div><h3>مهارت‌های فنی</h3></div>
+          <div class="skills"><span class="ltr" lang="en">Python</span><span class="ltr" lang="en">PyTorch</span><span class="ltr" lang="en">TensorFlow</span><span class="ltr" lang="en">Scikit-learn</span><span class="ltr" lang="en">NumPy</span><span class="ltr" lang="en">Pandas</span><span class="ltr" lang="en">Hugging Face Transformers</span><span class="ltr" lang="en">LangGraph</span><span class="ltr" lang="en">Whisper</span><span class="ltr" lang="en">openSMILE</span><span class="ltr" lang="en">Praat</span></div>
+        </article>
+    </div>
 
 <!-- Head TA Websites -->
 <div class="gallery-section reveal">
@@ -871,24 +945,53 @@ section{position:relative;padding:3.25rem 0}
 
     <div class="gallery-section reveal" id="gallery">
       <div class="gallery-head">
-        <div class="gallery-head .gicon" style="display:grid;place-items:center;width:2.25rem;height:2.25rem;border-radius:.625rem;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);color:var(--violet);flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1.15rem;height:1.15rem"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg></div>
+        <div class="gicon" style="display:grid;place-items:center;width:2.25rem;height:2.25rem;border-radius:.625rem;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);color:var(--violet);flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1.15rem;height:1.15rem"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg></div>
         <h3>مدارک، سوابق آموزشی و افتخارات</h3>
       </div>
-      <div class="gallery-grid" id="galleryGrid"></div>
+      <div class="gallery-grid" id="galleryGrid">
+        <a class="cert-card" href="01-teaching-assistant-page-1.png" target="_blank" rel="noopener noreferrer">
+          <span class="cert-thumb"><img src="assets/01-teaching-assistant-page-1-240.webp" srcset="assets/01-teaching-assistant-page-1-240.webp 240w, assets/01-teaching-assistant-page-1-480.webp 480w" sizes="(min-width: 78rem) 14rem, (min-width: 64rem) 19vw, (min-width: 48rem) 24vw, (min-width: 30rem) 31vw, 45vw" width="240" height="350" loading="lazy" decoding="async" alt="" /></span>
+          <span class="cert-cap">سوابق تدریسیاری دانشگاه علم و صنعت (۱)<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+        </a>
+        <a class="cert-card" href="02-teaching-assistant-page-2.png" target="_blank" rel="noopener noreferrer">
+          <span class="cert-thumb"><img src="assets/02-teaching-assistant-page-2-240.webp" srcset="assets/02-teaching-assistant-page-2-240.webp 240w, assets/02-teaching-assistant-page-2-480.webp 480w" sizes="(min-width: 78rem) 14rem, (min-width: 64rem) 19vw, (min-width: 48rem) 24vw, (min-width: 30rem) 31vw, 45vw" width="240" height="350" loading="lazy" decoding="async" alt="" /></span>
+          <span class="cert-cap">سوابق تدریسیاری دانشگاه علم و صنعت (۲)<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+        </a>
+        <a class="cert-card" href="03-teaching-assistant-page-3.png" target="_blank" rel="noopener noreferrer">
+          <span class="cert-thumb"><img src="assets/03-teaching-assistant-page-3-240.webp" srcset="assets/03-teaching-assistant-page-3-240.webp 240w, assets/03-teaching-assistant-page-3-480.webp 480w" sizes="(min-width: 78rem) 14rem, (min-width: 64rem) 19vw, (min-width: 48rem) 24vw, (min-width: 30rem) 31vw, 45vw" width="240" height="350" loading="lazy" decoding="async" alt="" /></span>
+          <span class="cert-cap">سوابق تدریسیاری دانشگاه علم و صنعت (۳)<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+        </a>
+        <a class="cert-card" href="04-teaching-assistant-page-4.png" target="_blank" rel="noopener noreferrer">
+          <span class="cert-thumb"><img src="assets/04-teaching-assistant-page-4-240.webp" srcset="assets/04-teaching-assistant-page-4-240.webp 240w, assets/04-teaching-assistant-page-4-480.webp 480w" sizes="(min-width: 78rem) 14rem, (min-width: 64rem) 19vw, (min-width: 48rem) 24vw, (min-width: 30rem) 31vw, 45vw" width="240" height="350" loading="lazy" decoding="async" alt="" /></span>
+          <span class="cert-cap">سوابق تدریسیاری دانشگاه علم و صنعت (۴)<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+        </a>
+        <a class="cert-card" href="05-teaching-certificate.png" target="_blank" rel="noopener noreferrer">
+          <span class="cert-thumb"><img src="assets/05-teaching-certificate-240.webp" srcset="assets/05-teaching-certificate-240.webp 240w, assets/05-teaching-certificate-480.webp 480w" sizes="(min-width: 78rem) 14rem, (min-width: 64rem) 19vw, (min-width: 48rem) 24vw, (min-width: 30rem) 31vw, 45vw" width="240" height="350" loading="lazy" decoding="async" alt="" /></span>
+          <span class="cert-cap">گواهی تدریسیاری برنامه‌نویسی<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+        </a>
+        <a class="cert-card" href="06-outstanding-teaching-assistant-award.png" target="_blank" rel="noopener noreferrer">
+          <span class="cert-thumb"><img src="assets/06-outstanding-teaching-assistant-award-240.webp" srcset="assets/06-outstanding-teaching-assistant-award-240.webp 240w, assets/06-outstanding-teaching-assistant-award-480.webp 480w" sizes="(min-width: 78rem) 14rem, (min-width: 64rem) 19vw, (min-width: 48rem) 24vw, (min-width: 30rem) 31vw, 45vw" width="240" height="350" loading="lazy" decoding="async" alt="" /></span>
+          <span class="cert-cap">افتخار دستیار آموزشی برتر<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+        </a>
+        <a class="cert-card" href="07-quera-instructor-certificate.png" target="_blank" rel="noopener noreferrer">
+          <span class="cert-thumb"><img src="assets/07-quera-instructor-certificate-240.webp" srcset="assets/07-quera-instructor-certificate-240.webp 240w, assets/07-quera-instructor-certificate-480.webp 480w" sizes="(min-width: 78rem) 14rem, (min-width: 64rem) 19vw, (min-width: 48rem) 24vw, (min-width: 30rem) 31vw, 45vw" width="240" height="350" loading="lazy" decoding="async" alt="" /></span>
+          <span class="cert-cap">گواهی تدریس Python و ++C در کوئرا<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+        </a>
+      </div>
     </div>
 
     <!-- Award Video -->
     <div class="video-section reveal" id="videoSection">
       <div class="sec-head" style="text-align:right;margin-bottom:1rem">
         <p class="eyebrow" style="color:var(--amber)">مراسم تقدیر</p>
-        <h2 style="font-size:1.1rem" >لحظه‌ای از مراسم تقدیر از دستیاران آموزشی برتر 🎓</h2>
+        <h3 style="font-size:1.1rem">لحظه‌ای از مراسم تقدیر از دستیاران آموزشی برتر 🎓</h3>
         <p style="font-size:.82rem">یکی از خاطره‌انگیزترین لحظه‌های دوران دانشگاه؛ مراسم تقدیر از من به‌عنوان دستیار آموزشی برتر دانشکده مهندسی کامپیوتر دانشگاه علم و صنعت ایران. (با VPN پخش کنید)</p>
       </div>
-      <div class="video-card" id="videoCard" onclick="openVideo()">
-        <div class="video-poster"></div>
-        <div class="video-play"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="6 3 20 12 6 21 6 3"/></svg></div>
-        <div class="video-meta"><h4>مراسم تقدیر از دستیاران آموزشی برتر</h4><p>دانشگاه علم و صنعت ایران — دانشکده مهندسی کامپیوتر</p></div>
-      </div>
+      <a class="video-card" id="videoCard" href="video_2026-11-19_20-15-16.mp4" target="_blank" rel="noopener noreferrer">
+        <img class="video-poster" src="assets/award-video-poster.webp" width="640" height="360" alt="" loading="lazy" decoding="async" />
+        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="6 3 20 12 6 21 6 3"/></svg></span>
+        <span class="video-meta"><span class="video-title">مراسم تقدیر از دستیاران آموزشی برتر</span><span>دانشگاه علم و صنعت ایران — دانشکده مهندسی کامپیوتر</span></span>
+      </a>
     </div>
   </div>
 </section>
@@ -897,7 +1000,50 @@ section{position:relative;padding:3.25rem 0}
 <section id="projects">
   <div class="container">
     <div class="sec-head reveal"><p class="eyebrow" style="color:var(--emerald)">تجربه فنی و پژوهشی</p> <h2>پروژه‌ها و فعالیت‌های پژوهشی من</h2><p>برخی از پروژه‌هایی که انجام دادم و پژوهش‌هایی که در حال حاضر روشون کار می‌کنم.</p></div>
-    <div class="projects-grid" id="projectsGrid"></div>
+    <div class="projects-grid" id="projectsGrid">
+      <article class="card proj-card">
+        <div class="proj-blob" style="background:var(--cyan)"></div><div style="position:relative">
+        <div class="proj-icon ic-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19v3M8 22h8"/><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/></svg></div><p class="proj-en" style="color:var(--cyan)" dir="ltr" lang="en">Spoken QA — Research in Progress</p>
+        <h3 class="proj-fa">ارزیابی هوشمند پاسخ‌های شفاهی</h3><p class="proj-desc">در حال پژوهش و طراحی سامانه‌ای چندوجهی برای ارزیابی پاسخ‌های شفاهی با استفاده از تشخیص گفتار، ارزیابی معنایی پاسخ و تحلیل آکوستیکی، تحت نظارت دکتر مزینی و دکتر داودآبادی.</p>
+        <div class="proj-tags"><span class="ltr" lang="en">Spoken QA</span><span class="ltr" lang="en">Speech Processing</span><span class="ltr" lang="en">NLP</span><span class="ltr" lang="en">پژوهش در حال انجام</span></div></div>
+      </article>
+      <article class="card proj-card">
+        <div class="proj-blob" style="background:var(--violet)"></div><div style="position:relative">
+        <div class="proj-icon ic-violet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 2 20h20L12 2Z"/><path d="M12 9v4M12 17h.01"/></svg></div><p class="proj-en" style="color:var(--violet)" dir="ltr" lang="en">Implicit Anger Detection — Research in Progress</p>
+        <h3 class="proj-fa">شناسایی عصبانیت پنهان</h3><p class="proj-desc">در حال توسعه مدلی هوشمند برای شناسایی عصبانیت پنهان در متون فارسی، تحت نظارت دکتر داودآبادی. این پژوهش در مرحله تهیه مقاله قرار داره.</p>
+        <div class="proj-tags"><span class="ltr" lang="en">Persian NLP</span><span class="ltr" lang="en">Text Classification</span><span class="ltr" lang="en">پژوهش در حال انجام</span></div></div>
+      </article>
+      <article class="card proj-card">
+        <div class="proj-blob" style="background:var(--emerald)"></div><div style="position:relative">
+        <div class="proj-icon ic-emerald"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h7"/></svg></div><p class="proj-en" style="color:var(--emerald)" dir="ltr" lang="en">Deep Learning Book — In Preparation</p>
+        <h3 class="proj-fa">تألیف کتاب یادگیری عمیق</h3><p class="proj-desc">به همراه دکتر داودآبادی در حال تهیه و تألیف کتابی در زمینه یادگیری عمیق هستم. این کتاب در مرحله نگارش قرار داره.</p>
+        <div class="proj-tags"><span class="ltr" lang="en">Deep Learning</span><span class="ltr" lang="en">Book Writing</span><span class="ltr" lang="en">در حال تألیف</span></div></div>
+      </article>
+      <article class="card proj-card">
+        <div class="proj-blob" style="background:var(--emerald)"></div><div style="position:relative">
+        <div class="proj-icon ic-emerald"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M8 2v4M16 2v4M3 10h18M8 15h3"/></svg></div><p class="proj-en" style="color:var(--emerald)" dir="ltr" lang="en">AI-Powered Smart Planner</p>
+        <h3 class="proj-fa">برنامه‌ریز هوشمند مبتنی بر هوش مصنوعی</h3><p class="proj-desc">فعالیت به‌عنوان متخصص هوش مصنوعی در یک سامانه برنامه‌ریزی هوشمند با مدیریت یکپارچه تقویم و اعلان‌های خودکار.</p>
+        <div class="proj-tags"><span class="ltr" lang="en">AI Systems</span><span class="ltr" lang="en">Smart Scheduling</span><span class="ltr" lang="en">Automation</span></div></div>
+      </article>
+      <article class="card proj-card">
+        <div class="proj-blob" style="background:var(--cyan)"></div><div style="position:relative">
+        <div class="proj-icon ic-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg></div><p class="proj-en" style="color:var(--cyan)" dir="ltr" lang="en">Automatic Soccer Video Commentary</p>
+        <h3 class="proj-fa">تولید خودکار شرح ویدیوهای فوتبال</h3><p class="proj-desc">استفاده از مدل‌های یادگیری عمیق روی مجموعه‌داده SoccerNet برای تولید شرح خودکار از رویدادهای ویدیویی فوتبال.</p>
+        <div class="proj-tags"><span class="ltr" lang="en">Deep Learning</span><span class="ltr" lang="en">SoccerNet</span><span class="ltr" lang="en">Video Captioning</span></div></div>
+      </article>
+      <article class="card proj-card">
+        <div class="proj-blob" style="background:var(--amber)"></div><div style="position:relative">
+        <div class="proj-icon ic-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18M7 17l4-5 4 3 5-8"/></svg></div><p class="proj-en" style="color:var(--amber)" dir="ltr" lang="en">Human Genome CNV Analysis</p>
+        <h3 class="proj-fa">تحلیل تغییرات تعداد نسخه در ژنوم انسان</h3><p class="proj-desc">تحلیل و مصورسازی تغییرات تعداد نسخه (CNV) در ژنوم انسان به‌عنوان یک پروژه تحلیل داده‌های ژنومی.</p>
+        <div class="proj-tags"><span class="ltr" lang="en">CNV</span><span class="ltr" lang="en">Genomics</span><span class="ltr" lang="en">Data Visualization</span></div></div>
+      </article>
+      <article class="card proj-card">
+        <div class="proj-blob" style="background:var(--violet)"></div><div style="position:relative">
+        <div class="proj-icon ic-violet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></div><p class="proj-en" style="color:var(--violet)" dir="ltr" lang="en">Reinforcement Learning — Lunar Lander</p>
+        <h3 class="proj-fa">یادگیری تقویتی</h3><p class="proj-desc">پیاده‌سازی یک عامل یادگیری تقویتی از پایه برای شبیه‌سازی Lunar Lander.</p>
+        <div class="proj-tags"><span class="ltr" lang="en">Reinforcement Learning</span><span class="ltr" lang="en">Agent</span><span class="ltr" lang="en">Simulation</span></div></div>
+      </article>
+    </div>
   </div>
 </section>
 
@@ -905,7 +1051,24 @@ section{position:relative;padding:3.25rem 0}
 <section id="courses">
   <div class="container">
     <div class="sec-head reveal"><p class="eyebrow" style="color:var(--cyan)">تجربه آموزشی گذشته</p><h2>دوره‌ها و محتوای آموزشی قبلی</h2></div>
-    <div class="courses-grid" id="coursesGrid"></div>
+    <div class="courses-grid" id="coursesGrid">
+      <a class="card course-link" href="https://youtube.com/playlist?list=PLiDaC7iN8rcYgYIaD2HVfmJiSy92g-WUL" target="_blank" rel="noopener noreferrer">
+        <div class="course-icon ic-rose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg></div><div class="course-body"><h3>دوره پایتون — تابستان ۱۴۰۳</h3><p>حدود ۱۰۰ ثبت‌نام</p></div>
+        <span class="course-cta" style="color:var(--rose)">پلی‌لیست یوتیوب<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+      </a>
+      <a class="card course-link" href="https://quera.org/events/levelup-0409" target="_blank" rel="noopener noreferrer">
+        <div class="course-icon ic-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div><div class="course-body"><h3>کوئرا لِول‌آپ — Python &amp; ++C</h3><p>تدریس عمومی با همکاری کوئرا</p></div>
+        <span class="course-cta" style="color:var(--cyan)">صفحه رویداد کوئرا<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+      </a>
+      <a class="card course-link" href="https://youtube.com/playlist?list=PLiDaC7iN8rca0TDdbHudVW5XuNKL4dT4M" target="_blank" rel="noopener noreferrer">
+        <div class="course-icon ic-violet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16l7-3 7 3z"/></svg></div><div class="course-body"><h3>پلی‌لیست یادگیری ماشین</h3><p>محتوای آموزشی ML</p></div>
+        <span class="course-cta" style="color:var(--violet)">پلی‌لیست یوتیوب<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+      </a>
+      <a class="card course-link" href="https://youtube.com/playlist?list=PLiDaC7iN8rcbDafLjhTHK6KsYzuKZO0mM" target="_blank" rel="noopener noreferrer">
+        <div class="course-icon ic-emerald"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 16V9"/><path d="M11 16v-5"/><path d="M15 16v-3"/></svg></div><div class="course-body"><h3>پلی‌لیست هوش مصنوعی</h3><p>محتوای آموزشی AI</p></div>
+        <span class="course-cta" style="color:var(--emerald)">پلی‌لیست یوتیوب<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+      </a>
+    </div>
     <div class="blended reveal"><div class="blended-inner"><div class="blended-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16l7-3 7 3z"/></svg></div><p>برای استفاده بهتر از زمان کلاس، بعضی مباحث مقدماتی که قبلا ضبط کردم به‌عنوان منابع کمکی معرفی می‌شن. توی کلاس روی مباحث جدید، تمرین‌های عملی، مفاهیم تخصصی تمرکز بیشتری داریم.</p></div></div>
   </div>
 </section>
@@ -916,8 +1079,78 @@ section{position:relative;padding:3.25rem 0}
   <div class="container" style="position:relative;max-width:60rem">
     <div class="sec-head reveal"><p class="eyebrow" style="color:var(--emerald)">منابع پیش‌نیاز رایگان</p><h2>برای شروع، از این‌جاها شروع کن</h2></div>
     <div class="res-msg reveal"><div class="res-msg-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><p>برای شروع، تسلط قبلی به یادگیری ماشین یا ریاضیات پیشرفته لازم نیست. فقط پیشنهاد می‌کنم با مبانی پایتون آشنا بشی؛ یکی از آموزش‌های مقدماتی معرفی‌شده برای شروع کافیه.</p></div></div>
-    <div class="res-tabs" id="resTabs"></div>
-    <div class="res-list" id="resList"></div>
+    <div class="res-tabs" id="resTabs" role="tablist" aria-label="دسته‌بندی منابع" hidden>
+      <button type="button" id="resource-tab-pytorch" class="res-tab orange" aria-controls="resource-pytorch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>PyTorch</button>
+      <button type="button" id="resource-tab-linalg" class="res-tab cyan" aria-controls="resource-linalg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4.602A6.5 6.5 0 0 0 3.708 9.49a6.5 6.5 0 0 0 2.294 8.114L6 18"/><path d="M14 19.398A6.5 6.5 0 0 0 22 16.5"/></svg>جبر خطی</button>
+      <button type="button" id="resource-tab-py-en" class="res-tab emerald" aria-controls="resource-py-en"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>پایتون — انگلیسی</button>
+      <button type="button" id="resource-tab-py-fa" class="res-tab violet" aria-controls="resource-py-fa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8l6 6"/><path d="m4 14 6-6 6-6"/><path d="M14 4l6 6"/></svg>پایتون — فارسی</button>
+    </div>
+    <div id="resList">
+      <div class="res-category" id="resource-pytorch">
+        <h3 class="res-category-heading">PyTorch</h3>
+        <div class="res-list">
+          <a class="card res-item" href="https://youtu.be/glFOMj0h768" target="_blank" rel="noopener noreferrer">
+            <span class="res-thumb" aria-hidden="true" data-thumbnail="https://i.ytimg.com/vi/glFOMj0h768/mqdefault.jpg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 5 12 7-12 7z"/></svg></span>
+            <span class="res-body"><span class="num ltr" style="color:var(--orange)">۳ جلسه مقدماتی · #1</span><span class="url ltr">youtu.be/glFOMj0h768</span><span class="watch">تماشا در یوتیوب</span></span>
+          </a>
+          <a class="card res-item" href="https://youtu.be/UWyLFS1MYR0" target="_blank" rel="noopener noreferrer">
+            <span class="res-thumb" aria-hidden="true" data-thumbnail="https://i.ytimg.com/vi/UWyLFS1MYR0/mqdefault.jpg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 5 12 7-12 7z"/></svg></span>
+            <span class="res-body"><span class="num ltr" style="color:var(--orange)">۳ جلسه مقدماتی · #2</span><span class="url ltr">youtu.be/UWyLFS1MYR0</span><span class="watch">تماشا در یوتیوب</span></span>
+          </a>
+          <a class="card res-item" href="https://youtu.be/M4nJUww7qvI" target="_blank" rel="noopener noreferrer">
+            <span class="res-thumb" aria-hidden="true" data-thumbnail="https://i.ytimg.com/vi/M4nJUww7qvI/mqdefault.jpg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 5 12 7-12 7z"/></svg></span>
+            <span class="res-body"><span class="num ltr" style="color:var(--orange)">۳ جلسه مقدماتی · #3</span><span class="url ltr">youtu.be/M4nJUww7qvI</span><span class="watch">تماشا در یوتیوب</span></span>
+          </a>
+        </div>
+      </div>
+      <div class="res-category" id="resource-linalg">
+        <h3 class="res-category-heading">جبر خطی</h3>
+        <div class="res-list">
+          <a class="card res-item" href="https://youtu.be/dLQ3Ew7osD4" target="_blank" rel="noopener noreferrer">
+            <span class="res-thumb" aria-hidden="true" data-thumbnail="https://i.ytimg.com/vi/dLQ3Ew7osD4/mqdefault.jpg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 5 12 7-12 7z"/></svg></span>
+            <span class="res-body"><span class="num ltr" style="color:var(--cyan)">۴ جلسه پیشین · #1</span><span class="url ltr">youtu.be/dLQ3Ew7osD4</span><span class="watch">تماشا در یوتیوب</span></span>
+          </a>
+          <a class="card res-item" href="https://www.youtube.com/watch?v=mWBrqxfX_WM" target="_blank" rel="noopener noreferrer">
+            <span class="res-thumb" aria-hidden="true" data-thumbnail="https://i.ytimg.com/vi/mWBrqxfX_WM/mqdefault.jpg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 5 12 7-12 7z"/></svg></span>
+            <span class="res-body"><span class="num ltr" style="color:var(--cyan)">۴ جلسه پیشین · #2</span><span class="url ltr">www.youtube.com/watch?v=mWBrqxfX_WM</span><span class="watch">تماشا در یوتیوب</span></span>
+          </a>
+          <a class="card res-item" href="https://www.youtube.com/watch?v=LWS1pzsUm5o" target="_blank" rel="noopener noreferrer">
+            <span class="res-thumb" aria-hidden="true" data-thumbnail="https://i.ytimg.com/vi/LWS1pzsUm5o/mqdefault.jpg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 5 12 7-12 7z"/></svg></span>
+            <span class="res-body"><span class="num ltr" style="color:var(--cyan)">۴ جلسه پیشین · #3</span><span class="url ltr">www.youtube.com/watch?v=LWS1pzsUm5o</span><span class="watch">تماشا در یوتیوب</span></span>
+          </a>
+          <a class="card res-item" href="https://youtu.be/PLI6swrfvY0" target="_blank" rel="noopener noreferrer">
+            <span class="res-thumb" aria-hidden="true" data-thumbnail="https://i.ytimg.com/vi/PLI6swrfvY0/mqdefault.jpg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 5 12 7-12 7z"/></svg></span>
+            <span class="res-body"><span class="num ltr" style="color:var(--cyan)">۴ جلسه پیشین · #4</span><span class="url ltr">youtu.be/PLI6swrfvY0</span><span class="watch">تماشا در یوتیوب</span></span>
+          </a>
+        </div>
+      </div>
+      <div class="res-category" id="resource-py-en">
+        <h3 class="res-category-heading">پایتون — انگلیسی</h3>
+        <div class="res-list">
+          <a class="card res-item" href="https://www.youtube.com/watch?v=kqtD5dpn9C8" target="_blank" rel="noopener noreferrer">
+            <span class="res-thumb" aria-hidden="true" data-thumbnail="https://i.ytimg.com/vi/kqtD5dpn9C8/mqdefault.jpg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 5 12 7-12 7z"/></svg></span>
+            <span class="res-body"><span class="num ltr" style="color:var(--emerald)">Python Basics · EN · #1</span><span class="url ltr">www.youtube.com/watch?v=kqtD5dpn9C8</span><span class="watch">تماشا در یوتیوب</span></span>
+          </a>
+          <a class="card res-item" href="https://www.youtube.com/watch?v=8KCuHHeC_M0" target="_blank" rel="noopener noreferrer">
+            <span class="res-thumb" aria-hidden="true" data-thumbnail="https://i.ytimg.com/vi/8KCuHHeC_M0/mqdefault.jpg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 5 12 7-12 7z"/></svg></span>
+            <span class="res-body"><span class="num ltr" style="color:var(--emerald)">Python Basics · EN · #2</span><span class="url ltr">www.youtube.com/watch?v=8KCuHHeC_M0</span><span class="watch">تماشا در یوتیوب</span></span>
+          </a>
+        </div>
+      </div>
+      <div class="res-category" id="resource-py-fa">
+        <h3 class="res-category-heading">پایتون — فارسی</h3>
+        <div class="res-list">
+          <a class="card res-item" href="https://www.youtube.com/watch?v=BsScQ1mOKrA" target="_blank" rel="noopener noreferrer">
+            <span class="res-thumb" aria-hidden="true" data-thumbnail="https://i.ytimg.com/vi/BsScQ1mOKrA/mqdefault.jpg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 5 12 7-12 7z"/></svg></span>
+            <span class="res-body"><span class="num ltr" style="color:var(--violet)">Python Basics · FA · #1</span><span class="url ltr">www.youtube.com/watch?v=BsScQ1mOKrA</span><span class="watch">تماشا در یوتیوب</span></span>
+          </a>
+          <a class="card res-item" href="https://www.youtube.com/watch?v=jI4Japu2DvQ" target="_blank" rel="noopener noreferrer">
+            <span class="res-thumb" aria-hidden="true" data-thumbnail="https://i.ytimg.com/vi/jI4Japu2DvQ/mqdefault.jpg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 5 12 7-12 7z"/></svg></span>
+            <span class="res-body"><span class="num ltr" style="color:var(--violet)">Python Basics · FA · #2</span><span class="url ltr">www.youtube.com/watch?v=jI4Japu2DvQ</span><span class="watch">تماشا در یوتیوب</span></span>
+          </a>
+        </div>
+      </div>
+    </div>
     <a class="res-math" href="https://t.me/Iustech/1205" target="_blank" rel="noopener noreferrer"><div class="res-math-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 3H5a2 2 0 0 0-2 2v14l4-4h12a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/></svg></div><div class="res-math-body"><h3>مرجع ریاضیاتی</h3><p class="ltr">t.me/Iustech/1205</p></div></a>
   </div>
 </section>
@@ -926,13 +1159,38 @@ section{position:relative;padding:3.25rem 0}
 <section id="faq">
   <div class="container" style="max-width:44rem">
     <div class="sec-head reveal"><div class="eyebrow" style="display:inline-flex;align-items:center;gap:.4rem;color:var(--violet)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:.9rem;height:.9rem"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>سؤالات متداول</div><h2>پیش از اعلام علاقه‌مندی</h2></div>
-    <div class="faq-list" id="faqList"></div>
+    <div class="faq-list" id="faqList">
+      <article class="faq-item">
+        <h3><button class="faq-q" type="button" id="faq-question-1" aria-expanded="true" aria-controls="faq-answer-1"><span>آیا دوره از صفر شروع می‌شه؟</span><span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span></button></h3>
+        <div class="faq-a" id="faq-answer-1"><p>آره، قراره مفاهیم یادگیری ماشین از پایه و با هم شروع بشن.</p></div>
+      </article>
+      <article class="faq-item">
+        <h3><button class="faq-q" type="button" id="faq-question-2" aria-expanded="true" aria-controls="faq-answer-2"><span>آیا باید پایتون بلد باشم؟</span><span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span></button></h3>
+        <div class="faq-a" id="faq-answer-2"><p>تسلط پیشرفته لازم نیست، ولی آشنایی مقدماتی توصیه می‌شه. منابع رایگان برای شروع معرفی کردم.</p></div>
+      </article>
+      <article class="faq-item">
+        <h3><button class="faq-q" type="button" id="faq-question-3" aria-expanded="true" aria-controls="faq-answer-3"><span>آیا باید ریاضی قوی بلد باشم؟</span><span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span></button></h3>
+        <div class="faq-a" id="faq-answer-3"><p>نه، مبانی موردنیاز رو توی مسیر دوره با هم می‌ریم. البته پیشرفت توی مباحث تخصصی نیازمند تمرین و مطالعه‌ست.</p></div>
+      </article>
+      <article class="faq-item">
+        <h3><button class="faq-q" type="button" id="faq-question-4" aria-expanded="true" aria-controls="faq-answer-4"><span>آیا دوره عملی هم هست؟</span><span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span></button></h3>
+        <div class="faq-a" id="faq-answer-4"><p>آره، کار عملی با PyTorch و پیاده‌سازی مدل‌ها یکی از بخش‌های اصلی برنامه‌ست.</p></div>
+      </article>
+      <article class="faq-item">
+        <h3><button class="faq-q" type="button" id="faq-question-5" aria-expanded="true" aria-controls="faq-answer-5"><span>آیا برای مطالعه مقالات علمی هم مفیده؟</span><span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span></button></h3>
+        <div class="faq-a" id="faq-answer-5"><p>دوره طوری طراحی شده که پایه علمی و ریاضی مناسبی برای درک پژوهش‌های یادگیری ماشین بسازه.</p></div>
+      </article>
+      <article class="faq-item">
+        <h3><button class="faq-q" type="button" id="faq-question-6" aria-expanded="true" aria-controls="faq-answer-6"><span>زمان شروع، هزینه و نحوه برگزاری چطوره؟</span><span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span></button></h3>
+        <div class="faq-a" id="faq-answer-6"><p>جزئیات هنوز اعلام نشده؛ به‌محض نهایی‌شدن برنامه اطلاع‌رسانی می‌شه.</p></div>
+      </article>
+    </div>
   </div>
 </section>
 
 <!-- ============ FINAL CTA ============ -->
 <section class="final-cta">
-  <canvas class="final-canvas" id="finalCanvas"></canvas>
+  <canvas class="final-canvas" id="finalCanvas" aria-hidden="true"></canvas>
   <div class="final-radial"></div>
   <div class="bg-grid final-grid"></div>
   <div class="container"><div class="final-content">
@@ -943,8 +1201,9 @@ section{position:relative;padding:3.25rem 0}
       <a class="btn btn-primary" href="https://t.me/Iustech_support" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.9369 12.9104 18.5709 9.27638C19.0991 8.74812 19.0991 7.88916 18.5709 7.3609L15.4826 4.27262C14.9543 3.74436 14.0954 3.74436 13.5671 4.27262L6.07086 11.7689M14.9369 12.9104 7.42909 20.4083C6.90083 20.9365 6.04187 20.9365 5.51361 20.4083L4.42931 19.324C3.90105 18.7957 3.90105 17.9368 4.42931 17.4085L11.9271 9.91075M14.9369 12.9104 11.9271 9.91075"/></svg>اعلام علاقه‌مندی به دوره 🚀</a>
       <a class="btn btn-ghost" href="https://www.youtube.com/@iustech" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--cyan)"><polygon points="6 3 20 12 6 21 6 3"/></svg>مشاهده آموزش‌های رایگان</a>
     </div>
-    <button class="copy-btn" id="copyBtn" onclick="copyMessage()"><svg id="copyIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><span id="copyText">کپی پیام آماده‌شده برای تلگرام</span></button>
-    <p class="copy-msg" id="copyMsg">«سلام، من به شرکت در دوره یادگیری ماشین امیر جبلی علاقه‌مندم. لطفاً وقتی جزئیات دوره مشخص شد، راهنمایی‌م کنید.»</p>
+    <button class="copy-btn" id="copyBtn" type="button" hidden><svg id="copyIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><span id="copyText">کپی پیام آماده‌شده برای تلگرام</span></button>
+    <p id="copyStatus" class="copy-status" role="status"></p>
+    <p class="copy-msg" id="copyMsg" hidden>«سلام، من به شرکت در دوره یادگیری ماشین امیر جبلی علاقه‌مندم. لطفاً وقتی جزئیات دوره مشخص شد، راهنمایی‌م کنید.»</p>
     <p class="final-disclaimer">این مرحله صرفا برای اعلام علاقه‌مندی و دریافت اطلاعات بیشتره؛ ثبت‌نام قطعی دوره هنوز آغاز نشده.</p>
   </div></div>
 </section>
@@ -955,390 +1214,83 @@ section{position:relative;padding:3.25rem 0}
   <div class="footer-line"></div>
   <div class="container"><div class="footer-inner"><div class="footer-grid">
     
-<div class="footer-brand"><div class="logo-row"><span class="nav-logo-icon" style="width:1.75rem;height:1.75rem"><img src="ax.png" alt="لوگو" onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#38bdf8,#8b5cf6)'" /></span><div class="nav-logo-text"><span class="name ltr">Amir Jebbeli</span><span class="sub ltr">Machine Learning Education</span></div></div><p class="bio">یادگیری ماشین، هم با درک عمیق ریاضیات، هم با تجربه واقعی پیاده‌سازی.</p></div>
-    <div><h3>پیمایش</h3><ul class="footer-nav"><li><button onclick="scrollTo('home')">خانه</button></li><li><button onclick="scrollTo('course')">درباره دوره</button></li><li><button onclick="scrollTo('journey')">مسیر یادگیری</button></li><li><button onclick="scrollTo('instructor')">مدرس</button></li><li><button onclick="scrollTo('resources')">منابع رایگان</button></li><li><button onclick="scrollTo('faq')">سؤالات متداول</button></li></ul></div>
+<div class="footer-brand"><div class="logo-row"><span class="nav-logo-icon" style="width:1.75rem;height:1.75rem"><img src="assets/iustech-64.webp" srcset="assets/iustech-64.webp 1x, assets/iustech-128.webp 2x" width="64" height="64" alt="" /></span><div class="nav-logo-text"><span class="name ltr">Amir Jebbeli</span><span class="sub ltr">Machine Learning Education</span></div></div><p class="bio">یادگیری ماشین، هم با درک عمیق ریاضیات، هم با تجربه واقعی پیاده‌سازی.</p></div>
+    <div><h3>پیمایش</h3><ul class="footer-nav" id="siteNavigation"><li><a href="#home">خانه</a></li><li><a href="#course">درباره دوره</a></li><li><a href="#journey">مسیر یادگیری</a></li><li><a href="#instructor">مدرس</a></li><li><a href="#resources">منابع رایگان</a></li><li><a href="#faq">سؤالات متداول</a></li></ul></div>
     <div><h3>ارتباط</h3><ul class="footer-links"><li><a href="https://www.youtube.com/@iustech" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg>کانال یوتیوب</a></li><li><a href="https://t.me/Iustech_support" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.9369 12.9104 18.5709 9.27638C19.0991 8.74812 19.0991 7.88916 18.5709 7.3609L15.4826 4.27262C14.9543 3.74436 14.0954 3.74436 13.5671 4.27262L6.07086 11.7689M14.9369 12.9104 7.42909 20.4083C6.90083 20.9365 6.04187 20.9365 5.51361 20.4083L4.42931 19.324C3.90105 18.7957 3.90105 17.9368 4.42931 17.4085L11.9271 9.91075M14.9369 12.9104 11.9271 9.91075"/></svg>پشتیبانی تلگرام</a></li></ul></div>
-  </div><div class="footer-bottom"><p>© <span id="year"></span> — امیر جبلی | دوره یادگیری ماشین</p><p>ساخته‌شده با عشق به یادگیری ماشین و آموزش.</p></div></div></div>
+  </div><div class="footer-bottom"><p>© <span id="year">۲۰۲۶</span> — امیر جبلی | دوره یادگیری ماشین</p><p>ساخته‌شده با عشق به یادگیری ماشین و آموزش.</p></div></div></div>
 </footer>
 
 <!-- Floating Telegram -->
 <a class="float-tg" id="floatTg" href="https://t.me/Iustech_support" target="_blank" rel="noopener noreferrer" aria-label="اعلام علاقه‌مندی در تلگرام"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.9369 12.9104 18.5709 9.27638C19.0991 8.74812 19.0991 7.88916 18.5709 7.3609L15.4826 4.27262C14.9543 3.74436 14.0954 3.74436 13.5671 4.27262L6.07086 11.7689M14.9369 12.9104 7.42909 20.4083C6.90083 20.9365 6.04187 20.9365 5.51361 20.4083L4.42931 19.324C3.90105 18.7957 3.90105 17.9368 4.42931 17.4085L11.9271 9.91075M14.9369 12.9104 11.9271 9.91075"/></svg></a>
 
-<!-- Lightbox -->
-<div class="lightbox" id="lightbox" onclick="lbBgClick(event)">
-  <button class="lb-close" onclick="closeLightbox()" aria-label="بستن"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
-  <button class="lb-nav lb-prev" onclick="lbNav(-1);event.stopPropagation()" aria-label="قبلی"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
-  <button class="lb-nav lb-next" onclick="lbNav(1);event.stopPropagation()" aria-label="بعدی"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
-  <div class="lb-inner"><img class="lb-img" id="lbImg" alt="" /><div class="lb-cap" id="lbCap"></div></div>
-</div>
-
-<!-- Video Modal -->
-<div class="video-modal" id="videoModal" onclick="vmBgClick(event)">
-  <div class="vm-inner">
-    <button class="vm-close" onclick="closeVideo()" aria-label="بستن ویدیو"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
-    <video class="vm-video" id="vmVideo" controls playsinline preload="metadata"></video>
+<!-- High-resolution certificate viewer -->
+<dialog class="lightbox" id="lightbox" aria-labelledby="lbTitle">
+  <div class="dialog-header">
+    <h2 id="lbTitle">مدارک، سوابق آموزشی و افتخارات</h2>
+    <button class="dialog-button lb-close" type="button" data-close aria-label="بستن گالری"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
   </div>
-</div>
+  <div class="lb-inner">
+    <p id="lbStatus" class="dialog-status" role="status"></p>
+  </div>
+  <div class="lb-toolbar">
+    <button class="dialog-button lb-prev" type="button" aria-label="مدرک قبلی"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+    <p class="lb-cap" id="lbCap" aria-live="polite"></p>
+    <button class="dialog-button lb-next" type="button" aria-label="مدرک بعدی"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+  </div>
+  <a class="dialog-link" id="lbFull" href="01-teaching-assistant-page-1.png" target="_blank" rel="noopener noreferrer">نمایش تصویر با اندازهٔ اصلی</a>
+</dialog>
 
-<script>
-/* ============ CONFIG ============ */
-var SHOW_ID_CARD=false; /* privacy-sensitive: excluded from public gallery by default */
-var VIDEO_FILE="video_2026-11-19_20-15-16.mp4";
-
-/* ============ DATA ============ */
-var STAGES=[
-  {n:1,fa:"شروع از صفر",en:"Python Basics",desc:"آشنایی با پایتون به‌عنوان زبان کار با داده و مدل‌ها.",icon:'<polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/>'},
-  {n:2,fa:"مبانی ریاضی",en:"Linear Algebra · Calculus · Probability",desc:"بردارها، ماتریس‌ها، مشتق، بهینه‌سازی و احتمالات؛ زبان مشترک درک الگوریتم‌های یادگیری.",icon:'<path d="M14 4.602A6.5 6.5 0 0 0 3.708 9.49a6.5 6.5 0 0 0 2.294 8.114L6 18"/><path d="M14 19.398A6.5 6.5 0 0 0 22 16.5"/>'},
-  {n:3,fa:"یادگیری ماشین",en:"Models & Algorithms",desc:"از رگرسیون و درخت تصمیم تا مدل‌های مبتنی بر فاصله و شبکه‌های عصبی؛ چرا و چگونه کار می‌کنن.",icon:'<path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18a3 3 0 1 0 4.555-3.508 4 4 0 0 0 .556-6.588A4 4 0 0 0 14.997 5.125 3 3 0 1 0 12 5Z"/><path d="M12 5v13"/>'},
-  {n:4,fa:"پیاده‌سازی عملی",en:"PyTorch",desc:"ساخت مدل‌ها با PyTorch، آموزش، ارزیابی و دیباگ؛ از تعریف لایه تا حلقه آموزش.",icon:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>'},
-  {n:5,fa:"پروژه و تحلیل",en:"Practical Engineering",desc:"سراغ پروژه‌های واقعی می‌ریم تا مهارت‌های مهندسی و تحلیلی برای ساخت مدل‌های کاربردی شکل بگیره.",icon:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>'},
-  {n:6,fa:"مطالعه پژوهشی",en:"Reading ML Papers",desc:"با پشتوانه علمی، سراغ مطالعه مقالات یادگیری ماشین می‌ریم تا با زبان پژوهش آشنا بشیم.",icon:'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>'}
-];
-
-var ACHIEVEMENTS=[
-  {icon:'<path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>',accent:'cyan',title:"تحصیلات",items:["فارغ‌التحصیل مهندسی کامپیوتر، دانشگاه علم و صنعت ایران.","قبلش ۷ ترم ریاضیات و کاربردها خوندم؛ این مقطع رو کامل نکردم و انصراف دادم، ولی علاقه‌م به ریاضی همیشه کمکم می‌کنه."]},
-  {icon:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',accent:'violet',title:"تدریسیاری دانشگاه",items:["دستیار ارشد (Head TA) درس‌های یادگیری عمیق، یادگیری ماشین، پردازش زبان طبیعی، هوش مصنوعی، هوش محاسباتی و شبکه‌های عصبی.","دستیار آموزشی بینایی ماشین، سیستم‌های چندعامله","تدریس جبرخطی موردنیاز یادگیری ماشین در چندین ترم"]},
-  {icon:'<path d="M9 3h6v4l4 7a3 3 0 0 1-2 5H7a3 3 0 0 1-2-5l4-7z"/>',accent:'emerald',title:"پژوهش",items:["همکار پژوهشی در آزمایشگاه دکتر ناصر مزینی.","علاقه‌مندی‌ام NLP، هوش مصنوعی چندوجهی، سیستم‌های هوشمند مبتنی بر صوت و یادگیری عمیقه.","روی چند پروژه پژوهشی کار می‌کنم؛ هنوز در مراحل اولیه‌ست و مقاله‌ای منتشر نشده."]},
-  {icon:'<path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/>',accent:'cyan',title:"تدریس عمومی",items:["Python و ++C رو به بیش از ۱۳۰ دانشجو با همکاری کوئرا تدریس کردم.","مقدماتی هوش مصنوعی و یادگیری ماشین رو تو دوره‌ای ۲۵ جلسه‌ای به ۶۰ دانشجو آموزش دادم.","کانال یوتیوبم پر از محتوای برنامه‌نویسی، ریاضیات و هوش مصنوعیه."]},
-  
-  {icon:'<path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/>',accent:'violet',title:"جوایز و سوابق دیگر",items:["دانشجویان من رو به‌عنوان دستیار آموزشی برتر گروه مهندسی کامپیوتر علم و صنعت انتخاب کردن، بین بیش از ۱۰۰ دستیار آموزشی.","رئیس انجمن فارغ‌التحصیلان دانشگاه علم و صنعت ایران"]},
-
-];
-
-
-var SKILLS=["Python","PyTorch","TensorFlow","Scikit-learn","NumPy","Pandas","Hugging Face Transformers","LangGraph","Whisper","openSMILE","Praat"];
-
-
-var PROJECTS=[
-  {icon:'<path d="M12 19v3M8 22h8"/><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/>',accent:'cyan',title:"Spoken QA — Research in Progress",faTitle:"ارزیابی هوشمند پاسخ‌های شفاهی",desc:"در حال پژوهش و طراحی سامانه‌ای چندوجهی برای ارزیابی پاسخ‌های شفاهی با استفاده از تشخیص گفتار، ارزیابی معنایی پاسخ و تحلیل آکوستیکی، تحت نظارت دکتر مزینی و دکتر داودآبادی.",tags:["Spoken QA","Speech Processing","NLP","پژوهش در حال انجام"]},
-
-  {icon:'<path d="M12 2 2 20h20L12 2Z"/><path d="M12 9v4M12 17h.01"/>',accent:'violet',title:"Implicit Anger Detection — Research in Progress",faTitle:"شناسایی عصبانیت پنهان",desc:"در حال توسعه مدلی هوشمند برای شناسایی عصبانیت پنهان در متون فارسی، تحت نظارت دکتر داودآبادی. این پژوهش در مرحله تهیه مقاله قرار داره.",tags:["Persian NLP","Text Classification","پژوهش در حال انجام"]},
-
-  {icon:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h7"/>',accent:'emerald',title:"Deep Learning Book — In Preparation",faTitle:"تألیف کتاب یادگیری عمیق",desc:"به همراه دکتر داودآبادی در حال تهیه و تألیف کتابی در زمینه یادگیری عمیق هستم. این کتاب در مرحله نگارش قرار داره.",tags:["Deep Learning","Book Writing","در حال تألیف"]},
-
-  {icon:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M8 2v4M16 2v4M3 10h18M8 15h3"/>',accent:'emerald',title:"AI-Powered Smart Planner",faTitle:"برنامه‌ریز هوشمند مبتنی بر هوش مصنوعی",desc:"فعالیت به‌عنوان متخصص هوش مصنوعی در یک سامانه برنامه‌ریزی هوشمند با مدیریت یکپارچه تقویم و اعلان‌های خودکار.",tags:["AI Systems","Smart Scheduling","Automation"]},
-
-  {icon:'<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>',accent:'cyan',title:"Automatic Soccer Video Commentary",faTitle:"تولید خودکار شرح ویدیوهای فوتبال",desc:"استفاده از مدل‌های یادگیری عمیق روی مجموعه‌داده SoccerNet برای تولید شرح خودکار از رویدادهای ویدیویی فوتبال.",tags:["Deep Learning","SoccerNet","Video Captioning"]},
-
-  {icon:'<path d="M3 3v18h18M7 17l4-5 4 3 5-8"/>',accent:'amber',title:"Human Genome CNV Analysis",faTitle:"تحلیل تغییرات تعداد نسخه در ژنوم انسان",desc:"تحلیل و مصورسازی تغییرات تعداد نسخه (CNV) در ژنوم انسان به‌عنوان یک پروژه تحلیل داده‌های ژنومی.",tags:["CNV","Genomics","Data Visualization"]},
-
-  {icon:'<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>',accent:'violet',title:"Reinforcement Learning — Lunar Lander",faTitle:"یادگیری تقویتی",desc:"پیاده‌سازی یک عامل یادگیری تقویتی از پایه برای شبیه‌سازی Lunar Lander.",tags:["Reinforcement Learning","Agent","Simulation"]}
-];
-
-
-var COURSES=[
-  {title:"دوره پایتون — تابستان ۱۴۰۳",sub:"حدود ۱۰۰ ثبت‌نام",href:"https://youtube.com/playlist?list=PLiDaC7iN8rcYgYIaD2HVfmJiSy92g-WUL",icon:'<path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/>',accent:'rose',cta:"پلی‌لیست یوتیوب"},
-  {title:"کوئرا لِول‌آپ — Python & ++C",sub:"تدریس عمومی با همکاری کوئرا",href:"https://quera.org/events/levelup-0409",icon:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',accent:'cyan',cta:"صفحه رویداد کوئرا"},
-  {title:"پلی‌لیست یادگیری ماشین",sub:"محتوای آموزشی ML",href:"https://youtube.com/playlist?list=PLiDaC7iN8rca0TDdbHudVW5XuNKL4dT4M",icon:'<path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16l7-3 7 3z"/>',accent:'violet',cta:"پلی‌لیست یوتیوب"},
-  {title:"پلی‌لیست هوش مصنوعی",sub:"محتوای آموزشی AI",href:"https://youtube.com/playlist?list=PLiDaC7iN8rcbDafLjhTHK6KsYzuKZO0mM",icon:'<path d="M3 3v18h18"/><path d="M7 16V9"/><path d="M11 16v-5"/><path d="M15 16v-3"/>',accent:'emerald',cta:"پلی‌لیست یوتیوب"}
-];
-
-var RES_CATS=[
-  {id:"pytorch",label:"PyTorch",en:"۳ جلسه مقدماتی",accent:"orange",icon:'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',resources:["https://youtu.be/glFOMj0h768","https://youtu.be/UWyLFS1MYR0","https://youtu.be/M4nJUww7qvI"]},
-  {id:"linalg",label:"جبر خطی",en:"۴ جلسه پیشین",accent:"cyan",icon:'<path d="M14 4.602A6.5 6.5 0 0 0 3.708 9.49a6.5 6.5 0 0 0 2.294 8.114L6 18"/><path d="M14 19.398A6.5 6.5 0 0 0 22 16.5"/>',resources:["https://youtu.be/dLQ3Ew7osD4","https://www.youtube.com/watch?v=mWBrqxfX_WM","https://www.youtube.com/watch?v=LWS1pzsUm5o","https://youtu.be/PLI6swrfvY0"]},
-  {id:"py-en",label:"پایتون — انگلیسی",en:"Python Basics · EN",accent:"emerald",icon:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',resources:["https://www.youtube.com/watch?v=kqtD5dpn9C8","https://www.youtube.com/watch?v=8KCuHHeC_M0"]},
-  {id:"py-fa",label:"پایتون — فارسی",en:"Python Basics · FA",accent:"violet",icon:'<path d="M5 8l6 6"/><path d="m4 14 6-6 6-6"/><path d="M14 4l6 6"/>',resources:["https://www.youtube.com/watch?v=BsScQ1mOKrA","https://www.youtube.com/watch?v=jI4Japu2DvQ"]}
-];
-
-var FAQS=[
-  {q:"آیا دوره از صفر شروع می‌شه؟",a:"آره، قراره مفاهیم یادگیری ماشین از پایه و با هم شروع بشن."},
-  {q:"آیا باید پایتون بلد باشم؟",a:"تسلط پیشرفته لازم نیست، ولی آشنایی مقدماتی توصیه می‌شه. منابع رایگان برای شروع معرفی کردم."},
-  {q:"آیا باید ریاضی قوی بلد باشم؟",a:"نه، مبانی موردنیاز رو توی مسیر دوره با هم می‌ریم. البته پیشرفت توی مباحث تخصصی نیازمند تمرین و مطالعه‌ست."},
-  {q:"آیا دوره عملی هم هست؟",a:"آره، کار عملی با PyTorch و پیاده‌سازی مدل‌ها یکی از بخش‌های اصلی برنامه‌ست."},
-  {q:"آیا برای مطالعه مقالات علمی هم مفیده؟",a:"دوره طوری طراحی شده که پایه علمی و ریاضی مناسبی برای درک پژوهش‌های یادگیری ماشین بسازه."},
-  {q:"زمان شروع، هزینه و نحوه برگزاری چطوره؟",a:"جزئیات هنوز اعلام نشده؛ به‌محض نهایی‌شدن برنامه اطلاع‌رسانی می‌شه."}
-];
-
-var CERTS=[
-  {file:"01-teaching-assistant-page-1.png",cap:"سوابق تدریسیاری دانشگاه علم و صنعت (۱)"},
-  {file:"02-teaching-assistant-page-2.png",cap:"سوابق تدریسیاری دانشگاه علم و صنعت (۲)"},
-  {file:"03-teaching-assistant-page-3.png",cap:"سوابق تدریسیاری دانشگاه علم و صنعت (۳)"},
-  {file:"04-teaching-assistant-page-4.png",cap:"سوابق تدریسیاری دانشگاه علم و صنعت (۴)"},
-  {file:"05-teaching-certificate.png",cap:"گواهی تدریسیاری برنامه‌نویسی"},
-  {file:"06-outstanding-teaching-assistant-award.png",cap:"افتخار دستیار آموزشی برتر"},
-  {file:"07-quera-instructor-certificate.png",cap:"گواهی تدریس Python و ++C در کوئرا"}
-];
-/* ID card (08) is privacy-sensitive: excluded unless SHOW_ID_CARD === true */
-if(SHOW_ID_CARD){ CERTS.push({file:"08-research-assistant-id-card.png",cap:"کارت شناسایی دستیار پژوهشی"}); }
-
-var CODE_LINES=[
-  {t:"import torch",c:"kw"},{t:"import torch.nn as nn",c:"kw"},{t:"",c:""},
-  {t:"class MLP(nn.Module):",c:"def"},{t:"    def __init__(self, in_dim, hid, out_dim):",c:"def"},
-  {t:"        super().__init__()",c:"plain"},{t:"        self.net = nn.Sequential(",c:"plain"},
-  {t:"            nn.Linear(in_dim, hid),",c:"fn"},{t:"            nn.ReLU(),",c:"fn"},
-  {t:"            nn.Linear(hid, out_dim),",c:"fn"},{t:"        )",c:"plain"},{t:"",c:""},
-  {t:"    def forward(self, x):",c:"def"},{t:"        return self.net(x)",c:"plain"},{t:"",c:""},
-  {t:"model = MLP(784, 128, 10)",c:"plain"},{t:"loss_fn = nn.CrossEntropyLoss()",c:"plain"}
-];
-
-var COPY_MSG="سلام، من به شرکت در دوره یادگیری ماشین امیر جبلی علاقه‌مندم. لطفا وقتی جزئیات دوره مشخص شد، راهنمایی‌م کنید.";
-
-/* ============ HELPERS ============ */
-function toPersian(n){var m=["۰","۱","۲","۳","۴","۵","۶","۷","۸","۹"];return String(n).replace(/\d/g,function(d){return m[+d]})}
-function scrollTo(id){var el=document.getElementById(id);if(el)el.scrollIntoView({behavior:"smooth",block:"start"})}
-function svgWrap(inner){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+inner+'</svg>'}
-function themeColors(){var t=document.documentElement.getAttribute('data-theme');return t==='light'?{n1:'2,132,199',n2:'124,58,237'}:{n1:'56,189,248',n2:'139,92,246'}}
-
-/* ============ THEME ============ */
-function toggleTheme(){
-  var cur=document.documentElement.getAttribute('data-theme');
-  var next=cur==='light'?'dark':'light';
-  setTheme(next);
-}
-function setTheme(t){
-  document.documentElement.setAttribute('data-theme',t);
-  try{localStorage.setItem('theme',t)}catch(e){}
-  var m=document.getElementById('metaTheme'); if(m) m.setAttribute('content',t==='light'?'#f8fafc':'#080b14');
-  /* repaint canvases with new colors */
-  if(window.__nnRepaint){window.__nnRepaint()}
-}
-
-/* ============ NAV ============ */
-var navbar=document.getElementById("navbar"),navToggle=document.getElementById("navToggle"),navIcon=document.getElementById("navIcon"),mobileMenu=document.getElementById("mobileMenu");
-var ICON_MENU='<line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>';
-var ICON_CLOSE='<path d="M18 6 6 18"/><path d="m6 6 12 12"/>';
-window.addEventListener("scroll",function(){
-  navbar.classList.toggle("scrolled",window.scrollY>24);
-  document.getElementById("floatTg").classList.toggle("show",window.scrollY>window.innerHeight*0.6);
-},{passive:true});
-navToggle.addEventListener("click",function(){
-  var open=mobileMenu.classList.toggle("open");
-  navToggle.setAttribute("aria-expanded",open);
-  navIcon.innerHTML=open?ICON_CLOSE:ICON_MENU;
-  document.body.style.overflow=open?"hidden":"";
-});
-function closeMenu(){mobileMenu.classList.remove("open");navToggle.setAttribute("aria-expanded","false");navIcon.innerHTML=ICON_MENU;document.body.style.overflow=""}
-document.querySelectorAll("[data-target]").forEach(function(btn){btn.addEventListener("click",function(){closeMenu();scrollTo(btn.dataset.target)})});
-var sectionIds=["home","course","journey","instructor","resources","faq"];
-var ioNav=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){var id=e.target.id;document.querySelectorAll(".nav-link,.mobile-menu-link").forEach(function(l){l.classList.toggle("active",l.dataset.target===id)})}})},{rootMargin:"-45% 0px -50% 0px",threshold:0});
-sectionIds.forEach(function(id){var el=document.getElementById(id);if(el)ioNav.observe(el)});
-
-/* ============ NEURAL NETWORK CANVAS ============ */
-function initNeuralCanvas(canvasId){
-  var canvas=document.getElementById(canvasId);if(!canvas)return;
-  var ctx=canvas.getContext("2d");
-  var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var nodes=[],edges=[],pulses=[],w=0,h=0,dpr=1,raf;
-  function setup(){
-    var rect=canvas.getBoundingClientRect();dpr=Math.min(window.devicePixelRatio||1,2);
-    w=rect.width;h=rect.height;canvas.width=Math.floor(w*dpr);canvas.height=Math.floor(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
-    var layers=w<640?[3,5,6,4,2]:[4,7,9,7,4];
-    var padX=w*0.12,gapX=(w-padX*2)/(layers.length-1);nodes=[];
-    layers.forEach(function(c,li){var usableH=h*0.7,padY=(h-usableH)/2;for(var i=0;i<c;i++){var y=c===1?h/2:padY+(usableH*i)/(c-1);nodes.push({x:padX+gapX*li,y:y,r:2.4+Math.random()*1.8,layer:li,pulse:Math.random()*Math.PI*2,baseGlow:0.3+Math.random()*0.4})}});
-    edges=[];var offset=0;
-    for(var li=0;li<layers.length-1;li++){var aS=offset,aE=offset+layers[li],bS=aE,bE=bS+layers[li+1];for(var a=aS;a<aE;a++){for(var b=bS;b<bE;b++){if(Math.random()>0.32)continue;edges.push({from:a,to:b,weight:0.2+Math.random()*0.8})}}offset=aE}
-    pulses=[];
-  }
-  function spawnPulse(){if(edges.length===0)return;pulses.push({edge:Math.floor(Math.random()*edges.length),t:0,speed:0.008+Math.random()*0.012})}
-  var lastSpawn=0;
-  function draw(time){
-    ctx.clearRect(0,0,w,h);
-    var col=themeColors();
-    for(var i=0;i<edges.length;i++){var e=edges[i],a=nodes[e.from],b=nodes[e.to];if(!a||!b)continue;
-      var g=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
-      g.addColorStop(0,"rgba("+col.n1+","+(0.1+e.weight*0.12)+")");
-      g.addColorStop(0.5,"rgba("+col.n2+","+(0.12+e.weight*0.14)+")");
-      g.addColorStop(1,"rgba("+col.n1+","+(0.1+e.weight*0.12)+")");
-      ctx.strokeStyle=g;ctx.lineWidth=0.9;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
-    }
-    for(var i=pulses.length-1;i>=0;i--){var p=pulses[i],e=edges[p.edge];if(!e){pulses.splice(i,1);continue}var a=nodes[e.from],b=nodes[e.to];if(!a||!b){pulses.splice(i,1);continue}p.t+=p.speed;if(p.t>=1){pulses.splice(i,1);continue}
-      var px=a.x+(b.x-a.x)*p.t,py=a.y+(b.y-a.y)*p.t,trail=0.18,tx=a.x+(b.x-a.x)*Math.max(0,p.t-trail),ty=a.y+(b.y-a.y)*Math.max(0,p.t-trail);
-      var tg=ctx.createLinearGradient(tx,ty,px,py);tg.addColorStop(0,"rgba("+col.n1+",0)");tg.addColorStop(1,"rgba("+col.n1+",0.9)");
-      ctx.strokeStyle=tg;ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(tx,ty);ctx.lineTo(px,py);ctx.stroke();
-      ctx.beginPath();ctx.arc(px,py,2.4,0,Math.PI*2);ctx.fillStyle="rgba(186,230,253,0.95)";ctx.fill();
-    }
-    for(var i=0;i<nodes.length;i++){var n=nodes[i];var glow=reduce?n.baseGlow:n.baseGlow+Math.sin(time*0.001+n.pulse)*0.18;var radius=n.r+glow*1.2;
-      var isEdge=n.layer===0||n.layer===4;var c=isEdge?"52,211,153":(n.layer%2?col.n2:col.n1);
-      var halo=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,radius*4);halo.addColorStop(0,"rgba("+c+","+(0.4*glow)+")");halo.addColorStop(1,"rgba("+c+",0)");
-      ctx.fillStyle=halo;ctx.beginPath();ctx.arc(n.x,n.y,radius*4,0,Math.PI*2);ctx.fill();
-      ctx.beginPath();ctx.arc(n.x,n.y,radius,0,Math.PI*2);ctx.fillStyle="rgba("+c+","+(0.75+glow*0.25)+")";ctx.fill();
-    }
-    if(!reduce&&time-lastSpawn>220&&pulses.length<26){spawnPulse();lastSpawn=time}
-    raf=requestAnimationFrame(draw);
-  }
-  function start(){setup();if(reduce){draw(0)}else{raf=requestAnimationFrame(draw)}}
-  start();
-  var rt;window.addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(function(){setup()},200)});
-  return {repaint:function(){setup()}};
-}
-
-/* ============ CODE WINDOW ============ */
-function initCodeWindow(){
-  var win=document.getElementById("codeWindow"),body=document.getElementById("codeBody");if(!win||!body)return;
-  if(window.innerWidth<640)return;win.style.display="block";
-  var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;var shown=false,visible=0;
-  var obs=new IntersectionObserver(function(e){if(e[0].isIntersecting){shown=true;obs.disconnect();type()}},{threshold:0.3});obs.observe(win);
-  function type(){if(reduce){visible=CODE_LINES.length;render();return}var i=0;var interval=setInterval(function(){i++;visible=i;render();if(i>=CODE_LINES.length)clearInterval(interval)},130)}
-  function render(){body.innerHTML="";for(var i=0;i<visible;i++){var line=CODE_LINES[i];var div=document.createElement("div");div.className="code-line";var ln=document.createElement("span");ln.className="ln";ln.textContent=(i+1);var span=document.createElement("span");span.className=line.c;span.textContent=line.t===""?"\u00A0":line.t;div.appendChild(ln);div.appendChild(span);body.appendChild(div)}if(visible<CODE_LINES.length){var c=document.createElement("span");c.className="caret";body.appendChild(c)}else{var note=document.createElement("div");note.style.cssText="margin-top:.4rem;margin-left:1.9rem;color:rgba(52,211,153,.8);font-size:10.5px";note.textContent="# MLP";body.appendChild(note)}}
-}
-
-/* ============ STATS COUNTER ============ */
-function initCounters(){
-  var nums=document.querySelectorAll(".num[data-target]");var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  nums.forEach(function(el){var target=+el.dataset.target;var obs=new IntersectionObserver(function(e){if(!e[0].isIntersecting)return;obs.disconnect();if(reduce){el.textContent=toPersian(target);return}var start=performance.now(),dur=1600;function tick(now){var p=Math.min((now-start)/dur,1),eased=1-Math.pow(1-p,3);el.textContent=toPersian(Math.round(target*eased));if(p<1)requestAnimationFrame(tick)}requestAnimationFrame(tick)},{threshold:0.4});obs.observe(el)});
-}
-
-/* ============ REVEAL ============ */
-function initReveal(){var els=document.querySelectorAll(".reveal");var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add("visible");obs.unobserve(e.target)}})},{threshold:0.12});els.forEach(function(el){obs.observe(el)})}
-
-/* ============ PILLARS ============ */
-function setActivePillar(id){var eng=document.getElementById("pillarEng"),sci=document.getElementById("pillarSci");eng.className="pillar"+(id==="eng"?" active-cyan":"");sci.className="pillar"+(id==="sci"?" active-violet":"")}
-
-/* ============ LOSS CURVE ============ */
-function buildLossCurve(){
-  var wrap=document.getElementById("lossCurveWrap");if(!wrap)return;
-  var stroke=getComputedStyle(document.documentElement).getPropertyValue('--violet').trim()||'#8b5cf6';
-  var fill="rgba(139,92,246,0.12)",w=260,h=110;
-  var pts=[[10,18],[48,32],[92,54],[136,74],[180,88],[224,96],[256,100]];
-  var path="M"+pts.map(function(p,i){return i===0?p[0]+","+p[1]:"Q "+((pts[i-1][0]+p[0])/2)+","+pts[i-1][1]+" "+p[0]+","+p[1]}).join(" ");
-  var area=path+" L "+w+","+h+" L 0,"+h+" Z";
-  var grid=[0.25,0.5,0.75].map(function(p){return '<line x1="0" x2="'+w+'" y1="'+(h*p)+'" y2="'+(h*p)+'" stroke="rgba(148,163,184,0.08)" stroke-width="1"/>'}).join("");
-  var markers=pts.slice(0,-1).map(function(p,i){return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="2.5" fill="'+stroke+'" opacity="0"><animate attributeName="opacity" to="0.6" begin="'+(0.8+i*0.25)+'s" dur="0.4s" fill="freeze"/></circle>'}).join("");
-  wrap.innerHTML='<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;height:auto" role="img" aria-label="نمودار تزئینی نزول تابع هزینه">'+grid+'<path d="'+area+'" fill="'+fill+'"/><path d="'+path+'" fill="none" stroke="'+stroke+'" stroke-width="2" stroke-linecap="round" stroke-dasharray="600" stroke-dashoffset="600"><animate attributeName="stroke-dashoffset" to="0" dur="2s" begin="0.3s" fill="freeze" calcMode="spline" keySplines="0.16 1 0.3 1"/></path>'+markers+'<circle cx="'+pts[pts.length-1][0]+'" cy="'+pts[pts.length-1][1]+'" r="4" fill="'+stroke+'" opacity="0"><animate attributeName="opacity" to="1" begin="1.8s" dur="0.5s" fill="freeze"/><animate attributeName="r" values="4;6;4" dur="2s" begin="2s" repeatCount="indefinite"/></circle><text x="10" y="12" fill="rgba(148,163,184,0.6)" font-size="8" font-family="monospace">loss</text><text x="'+(w-26)+'" y="'+(h-5)+'" fill="rgba(148,163,184,0.6)" font-size="8" font-family="monospace">epoch</text></svg>';
-}
-
-/* ============ JOURNEY ============ */
-function buildJourney(){
-  var wrap=document.getElementById("stages");if(!wrap)return;
-  STAGES.forEach(function(s,i){var isRight=i%2===1;var div=document.createElement("div");div.className="stage "+(isRight?"right":"left");div.setAttribute("data-stage",i);
-    div.innerHTML='<div class="stage-node off" data-node="'+i+'"><span>'+s.n+'</span><span class="ring"></span></div><div class="stage-card off"><div class="stage-badges"><span class="stage-badge tag ltr">Stage '+String(s.n).padStart(2,"0")+'</span><span class="stage-badge en ltr">'+s.en+'</span></div><h3>'+s.fa+'</h3><p>'+s.desc+'</p></div>';wrap.appendChild(div)});
-  var cards=document.querySelectorAll("[data-stage]"),fill=document.getElementById("journeyFill"),fillD=document.getElementById("journeyFillD"),active=-1;
-  var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){var idx=+e.target.getAttribute("data-stage");if(idx>active){active=idx;updateJourney()}}})},{rootMargin:"-30% 0px -55% 0px",threshold:0});
-  cards.forEach(function(c){obs.observe(c)});
-  function updateJourney(){var pct=((active+1)/STAGES.length)*100;if(fill)fill.style.height=pct+"%";if(fillD)fillD.style.height=pct+"%";
-    document.querySelectorAll("[data-stage]").forEach(function(c){var idx=+c.getAttribute("data-stage"),node=c.querySelector("[data-node]"),card=c.querySelector(".stage-card"),on=active>=idx;
-      node.className="stage-node "+(on?"on":"off");node.innerHTML=on?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+STAGES[idx].icon+'</svg><span class="ring"></span>':'<span>'+STAGES[idx].n+'</span><span class="ring"></span>';card.className="stage-card "+(on?"on":"off")});
-  }
-}
-
-/* ============ ACHIEVEMENTS ============ */
-function buildAchievements(){
-  var wrap=document.getElementById("achievements");if(!wrap)return;
-  ACHIEVEMENTS.forEach(function(a){var ic="ic-"+a.accent;var div=document.createElement("div");div.className="card ach-card reveal";
-    div.innerHTML='<div class="ach-head"><div class="ach-icon '+ic+'">'+svgWrap(a.icon)+'</div><h3>'+a.title+'</h3></div><ul class="ach-list">'+a.items.map(function(it){return '<li>'+svgWrap('<path d="M20 6 9 17l-5-5"/>')+'<span>'+it+'</span></li>'}).join("")+'</ul>';wrap.appendChild(div)});
-  var skillsDiv=document.createElement("div");skillsDiv.className="card ach-card reveal";
-  skillsDiv.innerHTML='<div class="ach-head"><div class="ach-icon ic-emerald">'+svgWrap('<rect width="4" height="16" x="4" y="4" rx="1"/><rect width="4" height="16" x="10" y="4" rx="1"/><rect width="4" height="16" x="16" y="4" rx="1"/>')+'</div><h3>مهارت‌های فنی</h3></div><div class="skills">'+SKILLS.map(function(s){return '<span class="ltr">'+s+'</span>'}).join("")+'</div>';wrap.appendChild(skillsDiv);
-  initReveal();
-}
-
-/* ============ PROJECTS ============ */
-function buildProjects(){var wrap=document.getElementById("projectsGrid");if(!wrap)return;PROJECTS.forEach(function(p){var ic="ic-"+p.accent;var div=document.createElement("div");div.className="card proj-card reveal";div.innerHTML='<div class="proj-blob" style="background:var(--'+p.accent+')"></div><div style="position:relative"><div class="proj-icon '+ic+'">'+svgWrap(p.icon)+'</div><p class="proj-en" style="color:var(--'+p.accent+')" dir="ltr">'+p.title+'</p><h3 class="proj-fa">'+p.faTitle+'</h3><p class="proj-desc">'+p.desc+'</p><div class="proj-tags">'+p.tags.map(function(t){return '<span class="ltr">'+t+'</span>'}).join("")+'</div></div>';wrap.appendChild(div)})}
-
-/* ============ COURSES ============ */
-function buildCourses(){var wrap=document.getElementById("coursesGrid");if(!wrap)return;COURSES.forEach(function(c){var ic="ic-"+c.accent;var a=document.createElement("a");a.className="card course-link reveal";a.href=c.href;a.target="_blank";a.rel="noopener noreferrer";a.innerHTML='<div class="course-icon '+ic+'">'+svgWrap(c.icon)+'</div><div class="course-body"><h3>'+c.title+'</h3><p>'+c.sub+'</p></div><span class="course-cta" style="color:var(--'+c.accent+')">'+c.cta+svgWrap('<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>')+'</span>';wrap.appendChild(a)})}
-
-/* ============ RESOURCES ============ */
-function buildResources(){var tabs=document.getElementById("resTabs"),list=document.getElementById("resList");if(!tabs||!list)return;RES_CATS.forEach(function(c,i){var btn=document.createElement("button");btn.className="res-tab "+c.accent+(i===0?" active":"");btn.setAttribute("data-cat",c.id);btn.innerHTML=svgWrap(c.icon)+c.label;btn.addEventListener("click",function(){selectCat(c.id)});tabs.appendChild(btn)});selectCat(RES_CATS[0].id)}
-function ytId(url){var m=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/);return m?m[1]:null}
-function selectCat(id){
-  document.querySelectorAll(".res-tab").forEach(function(t){t.classList.toggle("active",t.dataset.cat===id)});
-  var cat=RES_CATS.find(function(c){return c.id===id});var list=document.getElementById("resList");list.innerHTML="";
-  cat.resources.forEach(function(url,i){var vid=ytId(url);var a=document.createElement("a");a.className="card res-item";a.href=url;a.target="_blank";a.rel="noopener noreferrer";
-    var thumbHtml=vid?'<div class="res-thumb"><img src="https://img.youtube.com/vi/'+vid+'/hqdefault.jpg" alt="تصویر ویدیو" loading="lazy" onerror="this.parentNode.style.display=\'none\'"><div class="play"><div class="circle">'+svgWrap('<polygon points="6 3 20 12 6 21 6 3"/>')+'</div></div></div>':'<div class="res-thumb" style="display:grid;place-items:center">'+svgWrap('<path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/>')+'</div>';
-    a.innerHTML=thumbHtml+'<div class="res-body"><span class="num ltr" style="color:var(--'+cat.accent+')">'+cat.en+' · #'+(i+1)+'</span><span class="url ltr">'+url.replace(/^https?:\/\//,"")+'</span><span class="watch">تماشا در یوتیوب</span></div>';list.appendChild(a)});
-}
-
-/* ============ FAQ ============ */
-function buildFAQ(){var wrap=document.getElementById("faqList");if(!wrap)return;FAQS.forEach(function(f,i){var div=document.createElement("div");div.className="faq-item"+(i===0?" open":"");div.innerHTML='<button class="faq-q" onclick="toggleFAQ('+i+')" aria-expanded="'+(i===0)+'"><span>'+f.q+'</span><span class="faq-chevron">'+svgWrap('<path d="m6 9 6 6 6-6"/>')+'</span></button><div class="faq-a"><p>'+f.a+'</p></div>';wrap.appendChild(div)})}
-function toggleFAQ(i){var items=document.querySelectorAll(".faq-item");items.forEach(function(it,idx){var open=idx===i&&!it.classList.contains("open");it.classList.toggle("open",open);it.querySelector(".faq-q").setAttribute("aria-expanded",open)})}
-
-/* ============ CERTIFICATE GALLERY + LIGHTBOX ============ */
-var lbIndex=0;
-function buildGallery(){
-  var wrap=document.getElementById("galleryGrid");if(!wrap)return;
-  CERTS.forEach(function(c,i){
-    var card=document.createElement("div");card.className="cert-card";card.setAttribute("data-cert",i);
-    card.innerHTML='<img src="'+c.file+'" alt="'+c.cap+'" loading="lazy" draggable="false" /><div class="cert-zoom">'+svgWrap('<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>')+'</div><div class="cert-overlay"><span class="cert-cap">'+c.cap+'</span></div>';
-    card.addEventListener("click",function(){openLightbox(i)});
-    card.addEventListener("contextmenu",function(e){e.preventDefault()});
-    wrap.appendChild(card);
-  });
-}
-function openLightbox(i){lbIndex=i;showLb();document.getElementById("lightbox").classList.add("open");document.body.style.overflow="hidden"}
-function showLb(){var c=CERTS[lbIndex];var img=document.getElementById("lbImg"),cap=document.getElementById("lbCap");img.src=c.file;img.alt=c.cap;cap.textContent=(lbIndex+1)+" / "+CERTS.length+" — "+c.cap}
-function closeLightbox(){document.getElementById("lightbox").classList.remove("open");document.body.style.overflow=""}
-function lbNav(d){lbIndex=(lbIndex+d+CERTS.length)%CERTS.length;showLb()}
-function lbBgClick(e){if(e.target.id==="lightbox"||e.target.classList.contains("lb-inner"))closeLightbox()}
-document.addEventListener("keydown",function(e){
-  var lb=document.getElementById("lightbox");
-  if(lb.classList.contains("open")){
-    if(e.key==="Escape")closeLightbox();
-    else if(e.key==="ArrowLeft")lbNav(1); /* RTL: left = next */
-    else if(e.key==="ArrowRight")lbNav(-1); /* RTL: right = prev */
-  }
-  var vm=document.getElementById("videoModal");
-  if(vm.classList.contains("open")&&e.key==="Escape")closeVideo();
-});
-/* swipe support */
-(function(){
-  var lb=document.getElementById("lightbox"),sx=0,sy=0;
-  lb.addEventListener("touchstart",function(e){sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
-  lb.addEventListener("touchend",function(e){var dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){lbNav(dx>0?-1:1)}},{passive:true});
-})();
-
-/* ============ VIDEO MODAL ============ */
-function openVideo(){
-  var vm=document.getElementById("videoModal"),v=document.getElementById("vmVideo");
-  v.src=VIDEO_FILE;v.load();v.play().catch(function(){});vm.classList.add("open");document.body.style.overflow="hidden";
-}
-function closeVideo(){
-  var vm=document.getElementById("videoModal"),v=document.getElementById("vmVideo");
-  v.pause();v.removeAttribute("src");v.load();vm.classList.remove("open");document.body.style.overflow="";
-}
-function vmBgClick(e){if(e.target.id==="videoModal")closeVideo()}
-
-/* ============ COPY MESSAGE (no toast — inline feedback only) ============ */
-function copyMessage(){
-  var btn=document.getElementById("copyBtn"),icon=document.getElementById("copyIcon"),text=document.getElementById("copyText"),msg=document.getElementById("copyMsg");
-  function done(){
-    btn.classList.add("copied");icon.innerHTML='<path d="M20 6 9 17l-5-5"/>';text.textContent="کپی شد!";msg.classList.add("show");
-    setTimeout(function(){btn.classList.remove("copied");icon.innerHTML='<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>';text.textContent="کپی پیام آماده‌شده برای تلگرام";msg.classList.remove("show")},2600);
-  }
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(COPY_MSG).then(done).catch(fallback)}else{fallback()}
-  function fallback(){var ta=document.createElement("textarea");ta.value=COPY_MSG;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy")}catch(e){}document.body.removeChild(ta);done()}
-}
-
-/* ============ INIT ============ */
-document.getElementById("year").textContent=new Date().getFullYear();
-buildJourney();buildAchievements();buildProjects();buildCourses();buildResources();buildFAQ();buildGallery();buildLossCurve();
-initCounters();initReveal();initCodeWindow();
-var heroNN=initNeuralCanvas("heroCanvas");var finalNN=initNeuralCanvas("finalCanvas");
-window.__nnRepaint=function(){if(heroNN&&heroNN.repaint)heroNN.repaint();if(finalNN&&finalNN.repaint)finalNN.repaint()};
-</script>
+<!-- Award video -->
+<dialog class="video-modal" id="videoModal" aria-labelledby="vmTitle">
+  <div class="dialog-header">
+    <h2 id="vmTitle">مراسم تقدیر از دستیاران آموزشی برتر</h2>
+    <button class="dialog-button vm-close" type="button" data-close aria-label="بستن ویدیو"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+  </div>
+  <video class="vm-video" id="vmVideo" controls playsinline preload="none" data-poster="assets/award-video-poster.webp" aria-labelledby="vmTitle"></video>
+  <div class="vm-recovery" id="vmRecovery" hidden>
+    <p id="vmStatus" class="dialog-status" role="status"></p>
+    <button class="dialog-button" id="vmRetry" type="button">تلاش دوباره</button>
+    <a class="dialog-link" href="video_2026-11-19_20-15-16.mp4" target="_blank" rel="noopener noreferrer">باز کردن فایل ویدیو</a>
+  </div>
+</dialog>
 
 <div class="course-chat" lang="fa" dir="rtl">
   <button class="course-chat-launch" id="courseChatLaunch" type="button" aria-expanded="false" aria-controls="courseChatPanel" hidden>
     <span class="course-chat-brand" aria-hidden="true">
-      <span>IUS</span><img src="ax.png" width="44" height="44" alt="" />
+      <span>IUS</span><img src="assets/iustech-64.webp" srcset="assets/iustech-64.webp 1x, assets/iustech-128.webp 2x, assets/iustech-192.webp 3x" width="44" height="44" alt="" />
     </span>
     <span class="course-chat-launch-text">
       <strong>از دستیار هوشمند بپرس</strong>
-      <small>دوره، مدرس و یادگیری ماشین</small>
+      <small>دوره، مدرس و منابع رسمی</small>
     </span>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M20 11.5a8 8 0 0 1-8 8H8l-3 2 1-4a8 8 0 1 1 14-5.5Z"/><path d="M9 11.5h6"/>
     </svg>
   </button>
-  <div class="course-chat-panel" id="courseChatPanel" role="dialog" aria-labelledby="courseChatTitle" hidden>
+  <dialog class="course-chat-panel" id="courseChatPanel" aria-labelledby="courseChatTitle">
     <header class="course-chat-header">
       <span class="course-chat-brand" aria-hidden="true">
-        <span>IUS</span><img src="ax.png" width="44" height="44" alt="" />
+        <span>IUS</span><img src="assets/iustech-64.webp" srcset="assets/iustech-64.webp 1x, assets/iustech-128.webp 2x, assets/iustech-192.webp 3x" width="44" height="44" alt="" />
       </span>
       <div class="course-chat-heading">
         <h2 id="courseChatTitle">دستیار هوشمند <bdi lang="en">IUSTech</bdi></h2>
-        <p>پاسخ‌گوی سؤال‌های دوره و یادگیری ماشین</p>
+        <p>دوره، مدرس و منابع رسمی</p>
       </div>
+      <div class="course-chat-header-actions">
+      <button class="course-chat-action" id="courseChatNew" type="button" aria-label="گفتگوی تازه" title="گفتگوی تازه"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button class="course-chat-action" id="courseChatExpand" type="button" aria-label="باز کردن نمای بزرگ" aria-pressed="false" title="نمای بزرگ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg></button>
       <button class="course-chat-close" id="courseChatClose" type="button" aria-label="بستن گفتگو">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
       </button>
+      </div>
     </header>
     <div class="course-chat-welcome" id="courseChatWelcome">
       <div class="course-chat-intro">
         <span class="course-chat-brand" aria-hidden="true">
-          <span>IUS</span><img src="ax.png" width="66" height="66" alt="" />
+          <span>IUS</span><img src="assets/iustech-64.webp" srcset="assets/iustech-64.webp 1x, assets/iustech-128.webp 2x, assets/iustech-192.webp 3x" width="66" height="66" alt="" />
         </span>
         <h3>سلام! چی دوست داری بدونی؟</h3>
-        <p>دربارهٔ دوره، مدرس یا مسیر یادگیری سؤال بپرس.</p>
+        <p>دربارهٔ دورهٔ یادگیری ماشین، مدرس، پیش‌نیازها، سرفصل نظری یا منابع رسمی سایت سؤال بپرس.</p>
       </div>
       <div class="course-chat-suggestions" role="group" aria-label="پرسش‌های پیشنهادی">
         <button type="button">
@@ -1360,24 +1312,27 @@ window.__nnRepaint=function(){if(heroNN&&heroNN.repaint)heroNN.repaint();if(fina
       </div>
     </div>
     <div class="course-chat-log" id="courseChatLog" role="log" aria-label="پیام‌های گفتگو" tabindex="0" hidden></div>
-    <footer class="course-chat-footer">
+    <div class="course-chat-footer">
+      <button class="course-chat-jump" id="courseChatJump" type="button" hidden>آخرین پیام ↓</button>
       <div class="course-chat-status-row">
         <span class="course-chat-dots" aria-hidden="true"><span></span><span></span><span></span></span>
         <p class="course-chat-status" id="courseChatStatus" role="status" aria-atomic="true"></p>
+        <button class="course-chat-stop" id="courseChatStop" type="button" hidden>توقف انتظار</button>
       </div>
       <form class="course-chat-form" id="courseChatForm">
-        <textarea id="courseChatInput" rows="2" maxlength="500" required aria-label="سؤال شما" aria-describedby="courseChatCount" placeholder="سؤالت را دربارهٔ دوره یا یادگیری ماشین بپرس…"></textarea>
-        <button class="course-chat-send" id="courseChatSend" type="submit" aria-label="ارسال سؤال">
+        <textarea id="courseChatInput" rows="1" maxlength="500" dir="auto" enterkeyhint="send" required aria-label="سؤال شما" aria-describedby="courseChatCount" placeholder="سؤالت دربارهٔ دوره یا مدرس را بنویس…"></textarea>
+        <button class="course-chat-send" id="courseChatSend" type="submit" aria-label="ارسال سؤال" disabled>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 18V6m-6 6 6-6 6 6"/></svg>
         </button>
       </form>
       <div class="course-chat-meta">
         <p class="course-chat-help"><a href="https://t.me/Iustech_support" target="_blank" rel="noopener noreferrer">پشتیبانی تلگرام</a></p>
-        <span class="course-chat-count" id="courseChatCount" hidden></span>
+        <span class="course-chat-count" id="courseChatCount">۰ از ۵۰۰ نویسه</span>
       </div>
-    </footer>
-  </div>
+    </div>
+  </dialog>
 </div>
-<script src="course-chat.js" defer></script>
+<script src="site.js" type="module"></script>
+<script src="course-chat.js?v=2" type="module"></script>
 </body>
 </html>
