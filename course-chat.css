@@ -9,7 +9,7 @@
   --chat-aurora: linear-gradient(100deg, #9eebfc, #b4ceff 54%, #cdc0ff);
   position: fixed;
   z-index: 110;
-  left: var(--chat-left);
+  left: calc(var(--chat-left) + var(--chat-viewport-left, 0px));
   bottom: calc(var(--chat-bottom) + var(--chat-keyboard-offset, 0px));
   font-family: var(--font);
   text-align: start;
@@ -59,7 +59,7 @@
   object-fit: contain;
 }
 
-.course-chat-brand:has(img:not([hidden])) > span {
+.course-chat-brand.has-image > span {
   visibility: hidden;
 }
 
@@ -111,7 +111,7 @@
   inset: auto;
   margin: 0;
   padding: 0;
-  width: min(34rem, calc(100vw - var(--chat-left) - var(--chat-right)));
+  width: min(34rem, calc(var(--chat-viewport-width, 100vw) - var(--chat-left) - var(--chat-right)));
   max-width: none;
   height: 42rem;
   max-height: calc(100vh - var(--chat-bottom) - var(--chat-top));
@@ -132,7 +132,7 @@
 }
 
 .course-chat-panel.expanded {
-  width: min(43rem, calc(100vw - var(--chat-left) - var(--chat-right)));
+  width: min(43rem, calc(var(--chat-viewport-width, 100vw) - var(--chat-left) - var(--chat-right)));
   height: min(54rem, 88vh);
   height: min(54rem, 88dvh);
 }
@@ -373,7 +373,7 @@
   gap: .5rem;
 }
 
-.course-chat-status-row:has(p:not(:empty)) {
+.course-chat-status-row.has-status {
   padding-bottom: .48rem;
 }
 
@@ -391,7 +391,7 @@
   color: var(--chat-accent);
 }
 
-.course-chat-status-row:has([data-state="pending"]) .course-chat-dots {
+.course-chat-status-row.is-pending .course-chat-dots {
   display: flex;
 }
 
@@ -422,8 +422,7 @@
   flex: 1;
   min-width: 0;
   min-height: 2.75rem;
-  max-height: min(7.5rem, 24vh);
-  max-height: min(7.5rem, 24dvh);
+  max-height: 7.5rem;
   padding: .5rem .63rem;
   border: 1px solid var(--chat-control-border);
   border-radius: .75rem;
@@ -490,7 +489,9 @@
   .course-chat-panel,
   .course-chat-panel.expanded {
     position: fixed;
-    inset: auto var(--chat-right) calc(var(--chat-bottom) + var(--chat-keyboard-offset, 0px)) var(--chat-left);
+    inset: auto calc(var(--chat-right) + var(--chat-viewport-right, 0px))
+      calc(var(--chat-bottom) + var(--chat-keyboard-offset, 0px))
+      calc(var(--chat-left) + var(--chat-viewport-left, 0px));
     width: auto;
     height: calc(100vh - var(--chat-bottom) - var(--chat-top));
     height: calc(var(--chat-viewport-height, 100dvh) - var(--chat-bottom) - var(--chat-top));
@@ -514,10 +515,6 @@
   .course-chat-footer { padding-top: .35rem; }
 }
 
-@media (max-height: 330px) {
-  .course-chat-heading p { display: none; }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .course-chat-launch,
   .course-chat-panel,
@@ -534,7 +531,7 @@
 .course-chat-message:not(.course-chat-message-user) { white-space: normal; }
 .course-chat-message > * + * { margin-block-start: .65rem; }
 .course-chat-message p, .course-chat-message li { white-space: pre-wrap; }
-.course-chat-message h3 { font-size: 1em; line-height: 1.55; text-wrap: wrap; }
+.course-chat-message :is(h3, h4, h5, h6) { font-size: 1em; line-height: 1.55; text-wrap: wrap; }
 .course-chat-message ul, .course-chat-message ol { padding-inline-start: 1.5rem; }
 .course-chat-message li + li { margin-block-start: .2rem; }
 .course-chat-code { background: var(--bg-soft); border: 1px solid var(--border-strong); border-radius: .6rem; }
@@ -593,3 +590,20 @@
 .course-chat-failure .course-chat-text-button { text-decoration: underline; }
 .course-chat-status { font-size: .85rem; }
 .course-chat-count.at-limit { color: var(--chat-accent); font-weight: 800; }
+
+.course-chat-message h4 { color: var(--chat-accent); }
+.course-chat-message li > :is(ol, ul) { margin-block: .25rem; }
+.course-chat-message { border-radius: var(--radius); }
+.course-chat-message-user { border-start-start-radius: .35rem; }
+.course-chat-answer .course-chat-message { flex: 0 1 auto; max-inline-size: min(68ch, calc(100% - 2.2rem)); }
+.course-chat-code { overflow: hidden; }
+.course-chat-failure { border-inline-start: .2rem solid var(--rose); }
+.course-chat-status-row { flex-wrap: wrap; }
+.course-chat-status { flex: 1 1 auto; min-inline-size: 8rem; }
+
+@media (forced-colors: active) {
+  .course-chat-launch, .course-chat-send, .course-chat-action, .course-chat-text-button {
+    border: 1px solid ButtonText;
+  }
+  .course-chat :focus-visible { outline-color: Highlight; }
+}

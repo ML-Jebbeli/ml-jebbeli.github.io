@@ -1,4 +1,4 @@
-import { closeDialog, copyText, openModal } from "./site-ui.js";
+import { closeDialog, copyText, listenToMedia, openModal } from "./site-ui.js?v=3";
 
 const page = document.documentElement;
 const byId = (id) => document.getElementById(id);
@@ -28,13 +28,17 @@ function bindModal(dialog) {
 function initNavigation() {
   const links = [...document.querySelectorAll(".nav-link, .mobile-menu-link")];
   const sections = [...document.querySelectorAll(".nav-link")].map((link) => byId(link.hash.slice(1)));
+  const bottomUp = sections.slice().reverse();
   let renderedSection;
   let scrollFrame = 0;
 
   function updateNavigation() {
     scrollFrame = 0;
-    const boundary = nav.getBoundingClientRect().bottom + 48;
-    const section = sections.findLast((section) => section.getBoundingClientRect().top <= boundary) ?? sections[0];
+    let section = sections[0];
+    if (scrollY > 24) {
+      const boundary = nav.getBoundingClientRect().bottom + 48;
+      section = bottomUp.find((section) => section.getBoundingClientRect().top <= boundary) ?? section;
+    }
     if (section !== renderedSection) {
       renderedSection = section;
       for (const link of links) {
@@ -71,12 +75,12 @@ function initNavigation() {
         target.focus({ preventScroll: true });
       });
     }
-    desktopNavigation.addEventListener("change", (event) => {
+    listenToMedia(desktopNavigation, (event) => {
       if (!menu.open || !event.matches) return;
       closeDialog(menu);
       nav.querySelector(".nav-link[aria-current]")?.focus({ preventScroll: true });
     });
-    portrait.addEventListener("change", () => closeDialog(menu));
+    listenToMedia(portrait, () => closeDialog(menu));
   }
   updateNavigation();
   window.addEventListener("scroll", scheduleNavigation, { passive: true });
@@ -111,7 +115,7 @@ function initResourceTabs() {
       let next;
       if (event.key === "Home") next = 0;
       else if (event.key === "End") next = tabs.length - 1;
-      else if (Object.hasOwn(offsets, event.key)) next = (i + offsets[event.key] + tabs.length) % tabs.length;
+      else if (Object.prototype.hasOwnProperty.call(offsets, event.key)) next = (i + offsets[event.key] + tabs.length) % tabs.length;
       else return;
       event.preventDefault();
       select(next, true);
@@ -177,15 +181,22 @@ function initGallery() {
   const dialog = byId("lightbox");
   if (typeof dialog.showModal !== "function") return;
   const cards = [...document.querySelectorAll(".cert-card")];
-  const image = document.createElement("img");
-  image.id = "lbImg";
-  image.className = "lb-img";
   const caption = byId("lbCap");
   const status = byId("lbStatus");
   const full = byId("lbFull");
   const number = new Intl.NumberFormat("fa-IR");
+  let image;
   let current = 0;
   let swipeStart;
+
+  const loaded = ({ currentTarget }) => {
+    if (currentTarget === image && dialog.open) status.textContent = "";
+  };
+  const failed = ({ currentTarget }) => {
+    if (currentTarget !== image || !dialog.open) return;
+    image.hidden = true;
+    status.textContent = "نمایش تصویر ممکن نشد. پیوند تصویر اصلی را امتحان کنید.";
+  };
 
   function show(index) {
     current = (index + cards.length) % cards.length;
@@ -193,11 +204,16 @@ function initGallery() {
     const title = card.querySelector(".cert-cap").textContent.trim();
     caption.textContent = `${number.format(current + 1)} از ${number.format(cards.length)} — ${title}`;
     status.textContent = "در حال بارگیری تصویر…";
-    image.hidden = false;
+    image?.remove();
+    image = document.createElement("img");
+    image.id = "lbImg";
+    image.className = "lb-img";
     image.alt = title;
+    image.addEventListener("load", loaded, { once: true });
+    image.addEventListener("error", failed, { once: true });
     full.href = card.href;
     image.src = card.href;
-    if (!image.isConnected) status.before(image);
+    status.before(image);
   }
   bindModal(dialog);
   for (const [index, card] of cards.entries()) {
@@ -209,16 +225,11 @@ function initGallery() {
       dialog.querySelector("[data-close]").focus({ preventScroll: true });
     });
   }
-  image.addEventListener("load", () => { status.textContent = ""; });
-  image.addEventListener("error", () => {
-    if (!dialog.open) return;
-    image.hidden = true;
-    status.textContent = "نمایش تصویر ممکن نشد. پیوند تصویر اصلی را امتحان کنید.";
-  });
   dialog.addEventListener("close", () => {
-    if (!dialog.open) {
+    if (!dialog.open && image) {
       image.remove();
       image.removeAttribute("src");
+      image = undefined;
     }
   });
   dialog.querySelector(".lb-prev").addEventListener("click", () => show(current - 1));
@@ -246,11 +257,24 @@ function initVideo() {
   const trigger = byId("videoCard");
   const dialog = byId("videoModal");
   if (typeof dialog.showModal !== "function") return;
-  const player = byId("vmVideo");
+  let player = byId("vmVideo");
   const recovery = byId("vmRecovery");
   const status = byId("vmStatus");
   const retry = byId("vmRetry");
   let playback = 0;
+
+  function unload(video) {
+    video.pause();
+    video.removeAttribute("src");
+    video.load();
+  }
+
+  const playing = ({ currentTarget }) => {
+    if (currentTarget === player && dialog.open) recovery.hidden = true;
+  };
+  const failed = ({ currentTarget }) => {
+    if (currentTarget === player && player.hasAttribute("src")) report("پخش ویدیو ممکن نشد. دوباره تلاش کنید یا فایل ویدیو را باز کنید.");
+  };
 
   function report(message) {
     if (!dialog.open) return;
@@ -258,9 +282,16 @@ function initVideo() {
     recovery.hidden = false;
   }
 
-  function play() {
+  function play({ focus = false } = {}) {
     const attempt = ++playback;
     recovery.hidden = true;
+    const previous = player;
+    unload(previous);
+    player = previous.cloneNode(false);
+    previous.replaceWith(player);
+    player.addEventListener("playing", playing);
+    player.addEventListener("error", failed);
+    if (focus) player.focus({ preventScroll: true });
     player.poster = player.dataset.poster;
     player.src = trigger.href;
     player.play()?.catch((error) => {
@@ -277,20 +308,11 @@ function initVideo() {
     dialog.querySelector("[data-close]").focus({ preventScroll: true });
     play();
   });
-  retry.addEventListener("click", () => {
-    player.focus();
-    play();
-  });
-  player.addEventListener("playing", () => { recovery.hidden = true; });
-  player.addEventListener("error", () => {
-    if (player.hasAttribute("src")) report("پخش ویدیو ممکن نشد. دوباره تلاش کنید یا فایل ویدیو را باز کنید.");
-  });
+  retry.addEventListener("click", () => play({ focus: true }));
   dialog.addEventListener("close", () => {
     if (dialog.open) return;
     playback++;
-    player.pause();
-    player.removeAttribute("src");
-    player.load();
+    unload(player);
     recovery.hidden = true;
   });
 }
@@ -312,22 +334,23 @@ function initCanvas(canvas) {
   let dotColor;
   let pulseColor;
   let frame = 0;
-  let lastDraw = -Infinity;
+  let nextFrame = 0;
   let visible = false;
   const canObserve = typeof IntersectionObserver === "function";
   const frameInterval = navigator.connection?.saveData || matchMedia("(pointer: coarse)").matches ? 67 : 42;
+  const pixelBudget = 1200000;
 
   function geometry() {
-    const nextRatio = Math.min(window.devicePixelRatio || 1, 1.5);
     const { clientWidth, clientHeight } = canvas;
     if (!clientWidth || !clientHeight) return;
+    const nextRatio = Math.min(window.devicePixelRatio || 1, 1.5, Math.sqrt(pixelBudget / (clientWidth * clientHeight)));
     if (width === clientWidth && height === clientHeight && ratio === nextRatio) return;
     width = clientWidth;
     height = clientHeight;
     ratio = nextRatio;
-    canvas.width = Math.round(width * ratio);
-    canvas.height = Math.round(height * ratio);
-    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    canvas.width = Math.max(1, Math.floor(width * ratio));
+    canvas.height = Math.max(1, Math.floor(height * ratio));
+    ctx.setTransform(canvas.width / width, 0, 0, canvas.height / height, 0, 0);
 
     const columns = Math.max(5, Math.min(12, Math.floor(width / 125)));
     const rows = Math.max(3, Math.min(7, Math.floor(height / 105)));
@@ -387,23 +410,25 @@ function initCanvas(canvas) {
   }
 
   function tick(time) {
-    if (time - lastDraw >= frameInterval) {
-      draw(time);
-      lastDraw = time;
-    }
-    frame = requestAnimationFrame(tick);
+    frame = 0;
+    draw(time);
+    nextFrame = setTimeout(() => {
+      nextFrame = 0;
+      frame = requestAnimationFrame(tick);
+    }, Math.max(0, frameInterval - (performance.now() - time)));
   }
 
   function reconcile() {
-    const drawable = visible && !document.hidden;
+    const drawable = visible && !document.hidden && !page.classList.contains("dialog-open");
     if (drawable) geometry();
     if (!drawable || reducedMotion.matches || !canObserve) {
       if (frame) cancelAnimationFrame(frame);
+      clearTimeout(nextFrame);
       frame = 0;
+      nextFrame = 0;
       if (drawable) draw(0);
-    } else if (!frame) {
+    } else if (!frame && !nextFrame) {
       draw(0);
-      lastDraw = -Infinity;
       frame = requestAnimationFrame(tick);
     }
   }
@@ -419,7 +444,8 @@ function initCanvas(canvas) {
   if (typeof ResizeObserver === "function") new ResizeObserver(reconcile).observe(canvas);
   else window.addEventListener("resize", reconcile, { passive: true });
   document.addEventListener("visibilitychange", reconcile);
-  reducedMotion.addEventListener("change", reconcile);
+  document.addEventListener("site-modal-change", reconcile);
+  listenToMedia(reducedMotion, reconcile);
   return () => {
     readColors();
     if (visible && !document.hidden) draw(0);
@@ -433,7 +459,12 @@ initGallery();
 initVideo();
 initImageFallbacks();
 
-const redraw = [initCanvas(byId("heroCanvas")), initCanvas(byId("finalCanvas"))];
+const redraw = [];
+function initCanvases() {
+  redraw.push(initCanvas(byId("heroCanvas")), initCanvas(byId("finalCanvas")));
+}
+if (typeof requestIdleCallback === "function") requestIdleCallback(initCanvases, { timeout: 1000 });
+else requestAnimationFrame(initCanvases);
 function setTheme(theme) {
   page.dataset.theme = theme;
   byId("metaTheme").content = theme === "light" ? "#f8fafc" : "#080b14";
