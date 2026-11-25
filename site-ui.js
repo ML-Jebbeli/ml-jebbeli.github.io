@@ -1,10 +1,24 @@
 let activeModal = null;
 
+export function listenToMedia(query, callback) {
+  if (typeof query.addEventListener === "function") query.addEventListener("change", callback);
+  else if (typeof query.addListener === "function") query.addListener(callback);
+}
+
+export function hasOtherModal(dialog) {
+  return Boolean(activeModal?.open && activeModal !== dialog);
+}
+
+function notifyModalChange(open) {
+  document.documentElement.classList.toggle("dialog-open", open);
+  document.dispatchEvent(new Event("site-modal-change"));
+}
+
 function releaseModal(dialog) {
   if (dialog !== activeModal) return;
   activeModal = null;
   dialog.removeAttribute("aria-modal");
-  document.documentElement.classList.remove("dialog-open");
+  notifyModalChange(false);
 }
 
 document.addEventListener("close", (event) => {
@@ -13,10 +27,15 @@ document.addEventListener("close", (event) => {
 
 export function openModal(dialog) {
   if (typeof dialog.showModal !== "function" || activeModal?.open || dialog.open) return false;
-  dialog.showModal();
   activeModal = dialog;
+  try {
+    dialog.showModal();
+  } catch {
+    activeModal = null;
+    return false;
+  }
   dialog.setAttribute("aria-modal", "true");
-  document.documentElement.classList.add("dialog-open");
+  notifyModalChange(true);
   return true;
 }
 

@@ -1,5 +1,5 @@
-import { renderAnswer } from "./course-chat-render.js";
-import { closeDialog, copyText, openModal } from "./site-ui.js";
+import { renderAnswer } from "./course-chat-render.js?v=3";
+import { closeDialog, copyText, hasOtherModal, listenToMedia, openModal } from "./site-ui.js?v=3";
 
 const approvedHosts = new Set(["ml-jebbeli.github.io", "jebbeli-ai-preview.pages.dev"]);
 const endpoint = "https://jebbeli-ai-quota-lab-01.sedamir77.workers.dev/";
@@ -11,20 +11,19 @@ const requestBodyLimit = 32 * 1024;
 const encoder = new TextEncoder();
 const fa = new Intl.NumberFormat("fa-IR");
 
-function retryAfterSeconds(header) {
+function retryAfter(header, now) {
   const value = header?.trim();
   if (!value) return null;
   if (/^\d+$/u.test(value)) {
     const seconds = Number(value);
-    return Number.isSafeInteger(seconds) ? seconds : null;
+    return Number.isSafeInteger(seconds) ? { seconds, until: Math.min(Number.MAX_SAFE_INTEGER, now + seconds * 1000) } : null;
   }
   const date = new Date(value);
   if (!Number.isFinite(date.getTime()) || date.toUTCString() !== value) return null;
-  return Math.max(0, Math.ceil((date.getTime() - Date.now()) / 1000));
+  return { seconds: Math.max(0, Math.ceil((date.getTime() - now) / 1000)), until: date.getTime() };
 }
 
-function withWait(message, header) {
-  let seconds = retryAfterSeconds(header);
+function withWait(message, seconds) {
   if (seconds === null) return message + " کمی بعد دوباره تلاش کن.";
   if (!seconds) return message + " حالا می‌توانی دوباره تلاش کنی.";
   const duration = [];
@@ -36,8 +35,7 @@ function withWait(message, header) {
   return message + " " + duration.join(" و ") + " صبر کن و دوباره تلاش کن.";
 }
 
-function responseError(response, code) {
-  const wait = response.headers.get("Retry-After");
+function responseError(response, code, wait) {
   if (response.status === 429) {
     return withWait(["DAILY_AI_LIMIT_REACHED", "AI_QUOTA_EXHAUSTED"].includes(code)
       ? "سهمیهٔ روزانهٔ دستیار به پایان رسیده."
@@ -75,10 +73,17 @@ function init() {
   const viewport = window.visualViewport;
   const compact = matchMedia("(max-width: 639px), (max-width: 940px) and (max-height: 540px)");
   const exchanges = [];
+  const history = [];
+  const viewportProperties = ["--chat-viewport-height", "--chat-viewport-width", "--chat-viewport-left", "--chat-viewport-right", "--chat-keyboard-offset"];
+  let contextRevision = 0;
+  let cooldownUntil = 0;
+  let cooldownTimer;
   let pending;
   let restored;
   let followLatest = true;
   let modal = false;
+  let changingMode = false;
+  let viewportFrame = 0;
 
   function nearLatest() {
     return log.scrollHeight - log.scrollTop - log.clientHeight <= 52;
@@ -95,58 +100,108 @@ function init() {
   }
 
   function fitInput() {
+    const limit = Math.max(44, Math.min(120, Math.floor(panel.clientHeight / 4)));
     input.style.height = "auto";
-    input.style.height = `${input.scrollHeight + input.offsetHeight - input.clientHeight}px`;
+    const height = input.scrollHeight + input.offsetHeight - input.clientHeight;
+    input.style.height = `${Math.min(limit, height)}px`;
   }
 
   function fitViewport() {
     if (!panel.open) return;
-    const keyboard = viewport && viewport.scale === 1;
-    if (keyboard) {
-      const offset = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
-      widget.style.setProperty("--chat-keyboard-offset", `${offset}px`);
-      widget.style.setProperty("--chat-viewport-height", `${viewport.height}px`);
-    } else {
-      widget.style.removeProperty("--chat-keyboard-offset");
-      widget.style.removeProperty("--chat-viewport-height");
+    const scroll = log.scrollTop;
+    const height = viewport?.height || window.innerHeight;
+    const width = viewport?.width || window.innerWidth;
+    const top = viewport?.offsetTop || 0;
+    const left = viewport?.offsetLeft || 0;
+    const right = Math.max(0, window.innerWidth - width - left);
+    const bottom = Math.max(0, window.innerHeight - height - top);
+    for (const [index, value] of [height, width, left, right, bottom].entries()) {
+      widget.style.setProperty(viewportProperties[index], `${value}px`);
     }
     fitInput();
     if (followLatest) scrollToLatest();
+    else log.scrollTop = scroll;
   }
 
-  function togglePanel(open, { restore = true, focus } = {}) {
+  function scheduleViewport() {
+    if (!panel.open || viewportFrame) return;
+    viewportFrame = requestAnimationFrame(() => {
+      viewportFrame = 0;
+      fitViewport();
+    });
+  }
+
+  function showPanel() {
+    modal = compact.matches && typeof panel.showModal === "function";
+    if (modal) return openModal(panel);
+    panel.show();
+    return true;
+  }
+
+  function togglePanel(open, { restore = true } = {}) {
     if (open === panel.open) return;
     if (open) {
       launch.hidden = true;
-      modal = compact.matches;
-      if (modal && !openModal(panel)) {
+      if (!showPanel()) {
         launch.hidden = false;
         return;
       }
-      if (!modal) panel.show();
       launch.setAttribute("aria-expanded", "true");
       fitViewport();
-      const initial = focus ?? (modal || matchMedia("(pointer: coarse)").matches ? close : input);
+      const initial = modal || matchMedia("(pointer: coarse)").matches ? close : input;
       initial.focus({ preventScroll: true });
       updateJump();
     } else {
       launch.hidden = false;
       launch.setAttribute("aria-expanded", "false");
       closeDialog(panel);
-      widget.style.removeProperty("--chat-keyboard-offset");
-      widget.style.removeProperty("--chat-viewport-height");
+      cancelAnimationFrame(viewportFrame);
+      viewportFrame = 0;
+      for (const property of viewportProperties) widget.style.removeProperty(property);
       if (restore) launch.focus({ preventScroll: true });
     }
+  }
+
+  function syncDialogMode() {
+    if (changingMode || !panel.open || modal === compact.matches || hasOtherModal(panel) ||
+        typeof panel.showModal !== "function") return;
+    const active = panel.contains(document.activeElement) ? document.activeElement : close;
+    const selection = active === input ? [input.selectionStart, input.selectionEnd, input.selectionDirection] : null;
+    const scroll = log.scrollTop;
+    const welcomeScroll = welcome.scrollTop;
+    changingMode = true;
+    closeDialog(panel);
+    showPanel();
+    fitViewport();
+    const focus = active.getClientRects().length ? active : close;
+    focus.focus({ preventScroll: true });
+    if (selection) input.setSelectionRange(...selection);
+    if (!followLatest) log.scrollTop = scroll;
+    welcome.scrollTop = welcomeScroll;
+    updateJump();
+    changingMode = false;
+  }
+
+  function blocked() {
+    return Boolean(pending) || !navigator.onLine || Date.now() < cooldownUntil;
+  }
+
+  function scheduleCooldown() {
+    clearTimeout(cooldownTimer);
+    const remaining = cooldownUntil - Date.now();
+    if (remaining > 0) cooldownTimer = setTimeout(scheduleCooldown, Math.min(remaining, 2147483647));
+    else controls();
   }
 
   function controls() {
     const length = input.value.length;
     count.textContent = `${fa.format(length)} از ${fa.format(input.maxLength)} نویسه`;
     count.classList.toggle("at-limit", length >= input.maxLength);
-    send.disabled = Boolean(pending) || !navigator.onLine || !input.value.trim() || length > input.maxLength;
+    const unavailable = blocked();
+    send.disabled = unavailable || !input.value.trim() || length > input.maxLength;
     stop.hidden = !pending;
     for (const exchange of exchanges) {
-      if (exchange.retry) exchange.retry.disabled = Boolean(pending) || !navigator.onLine;
+      if (exchange.retry) exchange.retry.disabled = unavailable || exchange.revision !== contextRevision;
     }
     if (panel.open) fitInput();
   }
@@ -154,6 +209,8 @@ function init() {
   function setStatus(text, state) {
     status.textContent = text;
     status.dataset.state = state ?? "";
+    status.parentElement.classList.toggle("has-status", text !== "");
+    status.parentElement.classList.toggle("is-pending", state === "pending");
   }
 
   function createExchange(question) {
@@ -166,7 +223,7 @@ function init() {
     const response = document.createElement("div");
     response.className = "course-chat-result";
     element.append(prompt, response);
-    const exchange = { question, element, response };
+    const exchange = { question, element, response, revision: contextRevision };
     welcome.hidden = true;
     log.hidden = false;
     exchanges.push(exchange);
@@ -229,11 +286,8 @@ function init() {
   }
 
   function requestBody(exchange) {
-    // Retry in place using only completed exchanges preceding this question.
-    const history = exchanges.slice(0, exchanges.indexOf(exchange)).filter(turn => turn.answer)
-      .slice(-(historyMessageLimit / 2)).flatMap(turn => [
-        { role: "user", content: turn.question }, { role: "assistant", content: turn.answer },
-      ]);
+    // The history buffer advances only when a reply succeeds. A retry is only
+    // accepted in its original context, even after the visible log is trimmed.
     for (let start = 0; start <= history.length; start += 2) {
       const body = JSON.stringify({ message: exchange.question, history: history.slice(start) });
       if (encoder.encode(body).byteLength <= requestBodyLimit) return body;
@@ -255,6 +309,9 @@ function init() {
     if (abort) request.controller.abort();
     if (answer) {
       showAnswer(request.exchange, answer);
+      history.push({ role: "user", content: request.exchange.question }, { role: "assistant", content: answer });
+      if (history.length > historyMessageLimit) history.splice(0, 2);
+      contextRevision++;
       setStatus("", "success");
     } else {
       showFailure(request.exchange, error);
@@ -283,10 +340,15 @@ function init() {
       return;
     }
     if (pending !== request) return;
+    const wait = [429, 503].includes(response.status) ? retryAfter(response.headers.get("Retry-After"), Date.now()) : null;
     const data = await response.json().catch(() => null);
     if (pending !== request) return;
     if (!response.ok) {
-      finish(request, { error: responseError(response, data?.error?.code) });
+      if (wait?.until > Date.now()) {
+        cooldownUntil = wait.until;
+        scheduleCooldown();
+      }
+      finish(request, { error: responseError(response, data?.error?.code, wait?.seconds ?? null) });
     } else if (typeof data?.answer === "string" && data.answer.trim()) {
       finish(request, { answer: data.answer });
     } else {
@@ -295,7 +357,7 @@ function init() {
   }
 
   function start(exchange) {
-    if (pending || !navigator.onLine || !exchanges.includes(exchange) || exchange.answer) return;
+    if (blocked() || exchange.revision !== contextRevision || !exchanges.includes(exchange) || exchange.answer) return;
     const body = requestBody(exchange);
     if (!body) {
       showFailure(exchange, "حجم درخواست بیش از حد مجاز است.");
@@ -334,15 +396,11 @@ function init() {
       togglePanel(false);
     }
   });
-  compact.addEventListener("change", () => {
-    if (panel.open) {
-      const previous = panel.contains(document.activeElement) ? document.activeElement : undefined;
-      togglePanel(false, { restore: false });
-      togglePanel(true, { focus: previous === expand && compact.matches ? close : previous });
-    }
-  });
+  listenToMedia(compact, syncDialogMode);
+  document.addEventListener("site-modal-change", syncDialogMode);
   document.addEventListener("focusin", (event) => {
-    if (!panel.open || modal || widget.contains(event.target) || !(event.target instanceof HTMLElement)) return;
+    if (changingMode || !panel.open || modal || hasOtherModal(panel) ||
+        widget.contains(event.target) || !(event.target instanceof HTMLElement)) return;
     const area = panel.getBoundingClientRect();
     const target = event.target.getBoundingClientRect();
     if (target.width > 0 && target.height > 0 && target.left < area.right && target.right > area.left &&
@@ -358,6 +416,8 @@ function init() {
       request.controller.abort();
     }
     exchanges.length = 0;
+    history.length = 0;
+    contextRevision = 0;
     log.replaceChildren();
     log.hidden = true;
     welcome.hidden = false;
@@ -387,11 +447,18 @@ function init() {
     followLatest = nearLatest();
     updateJump();
   }, { passive: true });
-  widget.addEventListener("error", (event) => {
-    if (event.target.matches(".course-chat-brand img")) event.target.hidden = true;
-  }, true);
+  function syncBrandImage(image) {
+    const available = Boolean(image.naturalWidth);
+    image.hidden = !available;
+    image.parentElement.classList.toggle("has-image", available);
+  }
+  for (const event of ["load", "error"]) {
+    widget.addEventListener(event, ({ target }) => {
+      if (target.matches(".course-chat-brand img")) syncBrandImage(target);
+    }, true);
+  }
   for (const image of widget.querySelectorAll(".course-chat-brand img")) {
-    if (image.complete && !image.naturalWidth) image.hidden = true;
+    if (image.complete) syncBrandImage(image);
   }
   for (const button of welcome.querySelectorAll(".course-chat-suggestions button")) {
     button.addEventListener("click", () => {
@@ -407,9 +474,9 @@ function init() {
       if (!pending) setStatus(navigator.onLine ? "دوباره آنلاین شدی. ارسال با خودت است." : offline, event);
     });
   }
-  viewport?.addEventListener("resize", fitViewport);
-  viewport?.addEventListener("scroll", fitViewport);
-  window.addEventListener("resize", fitViewport);
+  viewport?.addEventListener("resize", scheduleViewport);
+  viewport?.addEventListener("scroll", scheduleViewport);
+  window.addEventListener("resize", scheduleViewport);
   input.addEventListener("input", () => {
     if (restored?.question !== input.value) restored = undefined;
     controls();
@@ -417,13 +484,16 @@ function init() {
   input.addEventListener("keydown", (event) => {
     if (event.key === "Enter" && !event.shiftKey && !event.isComposing && event.keyCode !== 229) {
       event.preventDefault();
-      if (!send.disabled) form.requestSubmit();
+      if (!send.disabled) {
+        if (typeof form.requestSubmit === "function") form.requestSubmit();
+        else send.click();
+      }
     }
   });
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const question = input.value.trim();
-    if (pending || !navigator.onLine || !question || input.value.length > input.maxLength) return;
+    if (blocked() || !question || input.value.length > input.maxLength) return;
     if (restored?.question === question) {
       start(restored);
       return;

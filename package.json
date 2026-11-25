@@ -3,10 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test test/frontend.test.mjs"
+    "test": "node --test test/frontend.test.mjs",
+    "test:content": "node test/content-integrity.mjs --check . && node test/content-states.mjs --check ."
   },
   "devDependencies": {
+    "acorn": "8.15.0",
     "axe-core": "4.14.1",
+    "parse5": "8.0.0",
     "playwright": "1.65.1"
   }
 }

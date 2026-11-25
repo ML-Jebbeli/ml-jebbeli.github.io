@@ -11,8 +11,12 @@ const site = "https://ml-jebbeli.github.io";
 const preview = "https://jebbeli-ai-preview.pages.dev";
 const worker = "https://jebbeli-ai-quota-lab-01.sedamir77.workers.dev/";
 const support = "https://t.me/Iustech_support";
-const matrix = [[320, 568], [360, 800], [390, 844], [430, 932], [844, 390], [768, 1024], [1024, 768],
-  [1024, 600], [1366, 768], [1440, 900], [1920, 1080], [2560, 1440], [3840, 2160]];
+const matrix = [
+  [320, 568], [360, 640], [360, 800], [375, 667], [390, 844], [412, 915], [430, 932],
+  [540, 720], [600, 900], [639, 800], [640, 800], [768, 1024], [820, 1180], [844, 390],
+  [1024, 600], [1024, 768], [1151, 800], [1152, 800], [1280, 720], [1366, 768],
+  [1440, 900], [1920, 1080], [2560, 1440], [3440, 1440], [3840, 2160],
+];
 const engine = process.env.JEBBELI_BROWSER ?? "chromium";
 assert.ok(Object.hasOwn({ chromium, firefox, webkit }, engine), "Unknown Playwright engine");
 const defaultAnswer = "دوره از مبانی ریاضی و پایتون تا پیاده‌سازی با PyTorch پیش می‌رود.";
@@ -40,6 +44,7 @@ async function pageFor(t, {
   const missingFiles = [];
   const calls = [];
   const localPaths = [];
+  const releaseAssets = [];
   await context.route("**/*", async (route) => {
     const request = route.request();
     const url = new URL(request.url());
@@ -62,6 +67,7 @@ async function pageFor(t, {
     const file = join(root, name);
     assert.ok(file.startsWith(root));
     localPaths.push(name);
+    if (name.endsWith(".js") || name.endsWith(".css")) releaseAssets.push(name + url.search);
     if (missing(name)) return route.fulfill({ status: 404 });
     try {
       await route.fulfill({ path: file });
@@ -75,7 +81,7 @@ async function pageFor(t, {
   if (beforeOpen) await beforeOpen(page);
   await page.goto(origin + path, { waitUntil: "load" });
   if (script) await page.locator("#themeToggle").waitFor();
-  return { context, page, errors, calls, localPaths, missingFiles };
+  return { context, page, errors, calls, localPaths, missingFiles, releaseAssets };
 }
 
 const visible = (locator) => locator.waitFor({ state: "visible" });
@@ -112,6 +118,7 @@ for (const [width, height] of engine === "chromium" ? matrix : [[390, 844], [844
           desktopNav: getComputedStyle(document.querySelector(".nav-links")).display !== "none",
           noTinyTargets: [".hero-ctas .btn-primary", ".theme-toggle", ".course-chat-launch"].every(s => rect(s).height >= 44),
           heroAction: rect(".hero-ctas .btn-primary").bottom < innerHeight,
+          heroActionsClear: rect(".hero-ctas").bottom <= rect(".course-chat-launch").top,
           aligned: nodes.every(el => Math.abs(el.getBoundingClientRect().left + el.offsetWidth / 2 - line.left - line.width / 2) <= 1),
           lineHeight: Number.parseFloat(getComputedStyle(document.querySelector(".hero-sub")).lineHeight),
           overflowAssets: [...document.querySelectorAll(".hero, .container, .stage-card, .course-body, .faq-q")]
@@ -122,6 +129,7 @@ for (const [width, height] of engine === "chromium" ? matrix : [[390, 844], [844
       assert.equal(layout.theme, theme);
       assert.equal(layout.bodyOverflow, "visible");
       assert.ok(layout.reflows && layout.navFits && layout.noTinyTargets && layout.heroAction && layout.aligned, JSON.stringify(layout));
+      if (width === 320) assert.ok(layout.heroActionsClear, JSON.stringify(layout));
       assert.equal(layout.desktopNav, width >= 1152);
       assert.ok(layout.lineHeight >= 24 && layout.courseMaxWidth <= 1216);
       assert.deepEqual(layout.overflowAssets, []);
@@ -329,15 +337,24 @@ test("HTTP and network failures are distinct from success and can be retried onl
     [{ json: { answer: "  " } }, /قابل خواندن نبود/u],
     [{ abort: true }, /ارتباط با دستیار برقرار نشد/u],
   ];
-  const { page, calls } = await pageFor(t, { response: async (_, index) => replies[index - 1]?.[0] ?? { json: { answer: defaultAnswer } } });
+  const { page, calls } = await pageFor(t, {
+    beforeOpen: page => page.clock.install(),
+    response: async (_, index) => replies[index - 1]?.[0] ?? { json: { answer: defaultAnswer } },
+  });
   await openChat(page);
   await ask(page, "دوره چه پیش‌نیازهایی دارد؟");
-  for (const [index, [, expected]] of replies.entries()) {
+  for (const [index, [reply, expected]] of replies.entries()) {
     await visible(page.locator(".course-chat-failure"));
     assert.match(await textOf(page, ".course-chat-failure p"), expected);
     assert.equal(calls.length, index + 1);
     assert.equal(await page.locator(".course-chat-exchange").count(), 1);
-    await page.getByRole("button", { name: "تلاش دوباره" }).click();
+    const retry = page.getByRole("button", { name: "تلاش دوباره" });
+    if (reply.headers?.["Retry-After"]) {
+      assert.equal(await retry.isDisabled(), true);
+      await page.clock.fastForward(Number(reply.headers["Retry-After"]) * 1000 + 15);
+      assert.equal(calls.length, index + 1);
+    }
+    await retry.click();
   }
   await visible(page.locator(".course-chat-answer"));
   assert.equal(calls.length, replies.length + 1);
@@ -482,6 +499,7 @@ test("mobile keyboard viewport, expanded panel and scroll anchoring maintain acc
       offsetTop: { configurable: true, value: 0 }, scale: { configurable: true, value: 1 } });
     visualViewport.dispatchEvent(new Event("resize"));
   });
+  await page.waitForFunction(() => document.querySelector(".course-chat").style.getPropertyValue("--chat-viewport-height") === "345px");
   for (const locator of [panel, inputFor(page), page.locator("#courseChatClose")]) {
     const box = await locator.boundingBox();
     assert.ok(box && box.y >= 0 && box.y + box.height <= 346, JSON.stringify(box));
@@ -602,4 +620,256 @@ test("the previously hidden research ID image is absent from current public file
   const body = await page.content();
   assert.ok(!body.includes(filename) && !body.includes("SHOW_ID_CARD"));
   assert.ok(!body.includes("user-scalable=no") && !body.includes("maximum-scale="));
+});
+
+test("an older failed exchange cannot change the context of a later successful conversation", async (t) => {
+  const { page, calls } = await pageFor(t, { response: async ({ message }) => message === "A"
+    ? { status: 400, json: {} } : { json: { answer: "Answer " + message } } });
+  await openChat(page);
+  await ask(page, "A");
+  await visible(page.locator(".course-chat-failure"));
+  await ask(page, "B", 1);
+  const retry = page.getByRole("button", { name: "تلاش دوباره" });
+  assert.equal(await retry.isDisabled(), true);
+  await retry.dispatchEvent("click");
+  await ask(page, "C", 2);
+  assert.deepEqual(calls.map(call => call.message), ["A", "B", "C"]);
+  assert.deepEqual(calls[2].history, [{ role: "user", content: "B" }, { role: "assistant", content: "Answer B" }]);
+  assert.deepEqual(await page.locator(".course-chat-message-user").allTextContents(), ["A", "B", "C"]);
+});
+
+test("retry keeps its original context after transcript pruning and preserves an unrelated draft", { skip: engine !== "chromium" }, async (t) => {
+  let retry = false;
+  const { page, calls } = await pageFor(t, {
+    response: async ({ message }) => message === "P" || retry ? { json: { answer: defaultAnswer } } : { status: 400, json: {} },
+  });
+  await openChat(page);
+  await ask(page, "P", 1);
+  const stop = page.locator("#courseChatStop");
+  for (let i = 0; i < 61; i++) {
+    await ask(page, "A" + i);
+    await hidden(stop);
+  }
+  assert.equal(await page.locator(".course-chat-message-user").first().textContent(), "A1");
+  await inputFor(page).fill("پیش‌نویس تازه");
+  retry = true;
+  await page.getByRole("button", { name: "تلاش دوباره" }).first().click();
+  await visible(page.locator(".course-chat-answer"));
+  assert.deepEqual(calls.at(-1), {
+    message: "A1", history: [{ role: "user", content: "P" }, { role: "assistant", content: defaultAnswer }],
+  });
+  assert.equal(await inputFor(page).inputValue(), "پیش‌نویس تازه");
+  assert.equal(await page.locator(".course-chat-exchange").count(), 60);
+});
+
+test("an HTTP-date Retry-After survives close, reopen and reset until its exact deadline", async (t) => {
+  const initial = Date.parse("2026-11-26T10:00:00Z");
+  const { page, calls } = await pageFor(t, {
+    beforeOpen: page => page.clock.install({ time: initial }),
+    response: async (_, i) => i === 1
+      ? { status: 429, headers: { "Retry-After": new Date(initial + 120_000).toUTCString() }, json: { error: { code: "RATE_LIMITED" } } }
+      : { json: { answer: defaultAnswer } },
+  });
+  await openChat(page);
+  await ask(page, "A");
+  await visible(page.locator(".course-chat-failure"));
+  assert.equal(await page.getByRole("button", { name: "تلاش دوباره" }).isDisabled(), true);
+  await page.locator("#courseChatClose").click();
+  await openChat(page);
+  await page.locator("#courseChatNew").click();
+  await inputFor(page).fill("B");
+  await inputFor(page).press("Enter");
+  assert.equal(await page.locator("#courseChatSend").isDisabled(), true);
+  const remaining = await page.evaluate(deadline => deadline - Date.now(), initial + 119_000);
+  await page.clock.fastForward(remaining);
+  assert.equal(await page.locator("#courseChatSend").isDisabled(), true);
+  await page.clock.fastForward(1100);
+  await page.waitForFunction(() => !document.querySelector("#courseChatSend").disabled);
+  assert.equal(calls.length, 1);
+  await inputFor(page).press("Enter");
+  await visible(page.locator(".course-chat-answer"));
+  assert.deepEqual(calls[1], { message: "B", history: [] });
+});
+
+test("resize keeps the pending request, input selection and scroll position through dialog mode changes", async (t) => {
+  const held = gate();
+  t.after(() => held.resume());
+  const { page, calls } = await pageFor(t, {
+    response: async (_, i) => {
+      if (i === 3) await held.waiting;
+      return { json: { answer: defaultAnswer.repeat(32) } };
+    },
+  });
+  await openChat(page);
+  await ask(page, "one", 1);
+  await ask(page, "two", 2);
+  await ask(page, "pending");
+  await visible(page.locator("#courseChatStop"));
+  await inputFor(page).fill("متن آزمایشی در حال نوشتن");
+  await inputFor(page).evaluate(input => input.setSelectionRange(3, 7));
+  const log = page.locator("#courseChatLog");
+  const initialScroll = await log.evaluate(el => { el.scrollTop = 38; return el.scrollTop; });
+  await visible(page.locator("#courseChatJump"));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await visible(page.locator("#courseChatPanel[aria-modal='true']"));
+  await page.evaluate(() => {
+    Object.defineProperties(visualViewport, {
+      width: { configurable: true, value: 375 }, height: { configurable: true, value: 245 },
+      offsetLeft: { configurable: true, value: 8 }, offsetTop: { configurable: true, value: 10 },
+      scale: { configurable: true, value: 1.2 },
+    });
+    visualViewport.dispatchEvent(new Event("resize"));
+  });
+  await page.waitForFunction(() => document.querySelector(".course-chat").style.getPropertyValue("--chat-viewport-height") === "245px");
+  for (const locator of [inputFor(page), page.locator("#courseChatClose"), page.locator("#courseChatStop")]) {
+    const box = await locator.boundingBox();
+    assert.ok(box && box.y >= 10 && box.y + box.height <= 255 && box.x >= 8 && box.x + box.width <= 383, JSON.stringify(box));
+  }
+  assert.equal(await inputFor(page).evaluate(el => document.activeElement === el), true);
+  assert.deepEqual(await inputFor(page).evaluate(el => [el.selectionStart, el.selectionEnd]), [3, 7]);
+  assert.ok(Math.abs(await log.evaluate(el => el.scrollTop) - initialScroll) <= 3);
+  await page.evaluate(() => {
+    for (const property of ["width", "height", "offsetLeft", "offsetTop", "scale"]) delete visualViewport[property];
+    visualViewport.dispatchEvent(new Event("resize"));
+  });
+  await page.setViewportSize({ width: 844, height: 390 });
+  await visible(page.locator("#courseChatPanel[aria-modal='true']"));
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.waitForFunction(() => document.querySelector("#courseChatPanel").getAttribute("aria-modal") === null);
+  held.resume();
+  await visible(page.locator(".course-chat-answer").nth(2));
+  assert.equal(await inputFor(page).inputValue(), "متن آزمایشی در حال نوشتن");
+  assert.equal(calls.length, 3);
+});
+
+test("a gallery modal owns focus during rotation and ignores stale image events", async (t) => {
+  const { page } = await pageFor(t, { missing: name => /^0[1-7]-.*\.png$/u.test(name) });
+  await openChat(page);
+  const previouslyFocused = await page.evaluate(() => document.activeElement.id);
+  await page.locator(".cert-card").first().evaluate(link => link.click());
+  await visible(page.locator("#lightbox[aria-modal='true']"));
+  const old = await page.locator("#lbImg").elementHandle();
+  await page.locator(".lb-next").click();
+  await page.locator("#lbImg[hidden]").waitFor({ state: "attached" });
+  await old.dispatchEvent("load");
+  await visible(page.locator("#lbStatus"));
+  assert.match(await page.locator("#lbStatus").textContent(), /نمایش تصویر ممکن نشد/u);
+  await page.setViewportSize({ width: 390, height: 844 });
+  assert.equal(await page.locator("#courseChatPanel").getAttribute("aria-modal"), null);
+  await page.keyboard.press("Escape");
+  await visible(page.locator("#courseChatPanel[aria-modal='true']"));
+  assert.equal(await page.evaluate(() => document.activeElement.id), previouslyFocused);
+});
+
+test("a closed video cannot report errors into a newly opened player", async (t) => {
+  const { page } = await pageFor(t, { initialize: () => {
+    window.pendingPlayback = [];
+    HTMLMediaElement.prototype.play = function () {
+      return new Promise((resolve, reject) => window.pendingPlayback.push({ resolve, reject }));
+    };
+  } });
+  const video = page.locator("#videoCard");
+  await video.click();
+  const prior = await page.locator("#vmVideo").elementHandle();
+  await page.locator(".vm-close").click();
+  await video.click();
+  await page.waitForFunction(() => window.pendingPlayback.length === 2);
+  await prior.dispatchEvent("error");
+  await page.evaluate(() => window.pendingPlayback[0].reject(new Error("Old playback")));
+  await hidden(page.locator("#vmRecovery"));
+  assert.equal(await page.locator("#videoModal").evaluate(el => el.open), true);
+});
+
+test("advanced Markdown preserves numbering, nesting, math, escaped pipes and malformed text", async (t) => {
+  const text = [
+    "## عنوان", "#### زیرعنوان", "", "7. نخست", "   - درون‌گذاری", "   - دادهٔ دوم", "12. English",
+    "", "| Type | Value |", "| --- | --- |", "| Math | `a|b` |", "| Escaped | x\\|y |",
+    "", "\\*literal\\* و `P(A|B)` و \\(a^2 + b^2\\)", "",
+    "[invalid](javascript:alert(1)) <svg onload='window.attack=true'>", "",
+    "```python", "<img src='https://attacker.invalid/track'>",
+  ].join("\n");
+  const { page } = await pageFor(t, {
+    response: async () => ({ json: { answer: text } }),
+    initialize: () => Object.defineProperty(navigator, "clipboard", { value: { writeText: async text => { window.rawCopy = text; } } }),
+  });
+  await openChat(page);
+  await ask(page, "آزمون ریاضی", 1);
+  const answer = page.locator(".course-chat-answer .course-chat-message");
+  assert.equal(await answer.locator("h3").textContent(), "عنوان");
+  assert.equal(await answer.locator("h4").textContent(), "زیرعنوان");
+  assert.deepEqual(await answer.locator("ol > li").evaluateAll(items => items.map(item => item.value)), [7, 12]);
+  assert.equal(await answer.locator("ol > li > ul > li").count(), 2);
+  assert.equal(await answer.locator("tbody code").textContent(), "a|b");
+  assert.match(await answer.locator("tbody").textContent(), /x\|y/u);
+  assert.ok((await answer.textContent()).includes("\\(a^2 + b^2\\)"));
+  assert.ok((await answer.textContent()).includes("```python"));
+  assert.equal(await answer.locator("a, img, svg, iframe, script").count(), 0);
+  await page.locator(".course-chat-copy").click();
+  assert.equal(await page.evaluate(() => window.rawCopy), text);
+});
+
+test("legacy optional APIs and a narrow high-DPI forced-color layout keep controls reachable", { skip: engine !== "chromium" }, async (t) => {
+  const { page, errors } = await pageFor(t, {
+    width: 320, height: 580,
+    initialize: () => {
+      Array.prototype.findLast = undefined;
+      Object.hasOwn = undefined;
+      window.IntersectionObserver = undefined;
+      window.ResizeObserver = undefined;
+      window.visualViewport = undefined;
+      const match = window.matchMedia.bind(window);
+      window.matchMedia = query => {
+        const list = match(query);
+        return { get matches() { return list.matches; }, addListener: fn => list.addListener(fn) };
+      };
+    },
+  });
+  await page.emulateMedia({ forcedColors: "active" });
+  await page.addStyleTag({ content: "main p, main h2, main h3 { line-height: 1.6 !important; letter-spacing: .12em !important; word-spacing: .16em !important; }" });
+  await openChat(page);
+  await ask(page, "آزمون", 1);
+  assert.ok(await page.locator("#courseChatClose").isVisible());
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth));
+  assert.deepEqual(errors, []);
+});
+
+test("a 4K high-DPI canvas fits in its backing-store budget and pauses behind a modal", { skip: engine !== "chromium" }, async (t) => {
+  const { page, context } = await pageFor(t, {
+    width: 3840, height: 2160, motion: "no-preference",
+    initialize: () => {
+      window.canvasFrames = 0;
+      const frame = window.requestAnimationFrame.bind(window);
+      window.requestAnimationFrame = cb => frame(time => {
+        if (cb.name === "tick") window.canvasFrames++;
+        cb(time);
+      });
+    },
+  });
+  const cdp = await context.newCDPSession(page);
+  await cdp.send("Emulation.setDeviceMetricsOverride", { width: 3840, height: 2160, deviceScaleFactor: 2, mobile: false });
+  await page.waitForFunction(() => document.querySelector("#heroCanvas").width > 300);
+  assert.ok(await page.locator("#heroCanvas").evaluate(canvas => canvas.width * canvas.height <= 1_200_000));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await openChat(page);
+  assert.ok(await page.locator("html").evaluate(el => el.classList.contains("dialog-open")));
+  const frame = await page.evaluate(() => window.canvasFrames);
+  await page.waitForTimeout(150);
+  assert.equal(await page.evaluate(() => window.canvasFrames), frame);
+});
+
+test("fresh and repeat loads use one version across all local entry points and module dependencies", async (t) => {
+  const { page, releaseAssets, errors, missingFiles } = await pageFor(t);
+  const entry = new Set([
+    "site.css", "course-chat.css", "site.js", "course-chat.js", "site-ui.js", "course-chat-render.js",
+  ]);
+  for (let i = 0; i < 2; i++) {
+    assert.deepEqual(new Set(releaseAssets.map(asset => asset.split("?")[0])), entry);
+    assert.equal(new Set(releaseAssets.map(asset => asset.split("?")[1])).size, 1);
+    assert.ok(releaseAssets.every(asset => /\?v=\d+$/u.test(asset)));
+    await openChat(page);
+    releaseAssets.length = 0;
+    await page.reload();
+  }
+  assert.deepEqual(errors, []);
+  assert.deepEqual(missingFiles, []);
 });
