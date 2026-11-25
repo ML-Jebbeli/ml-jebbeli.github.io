@@ -1,0 +1,12 @@
+{
+  "name": "jebbeli-website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/frontend.test.mjs"
+  },
+  "devDependencies": {
+    "axe-core": "4.14.1",
+    "playwright": "1.65.1"
+  }
+}
