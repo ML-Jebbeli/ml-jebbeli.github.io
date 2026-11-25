@@ -1017,3 +1017,12 @@ dialog::backdrop { background: #050a1dcc; }
   .nav-link[aria-current], .res-tab[aria-selected="true"],
   .faq-q[aria-expanded="true"] { outline: 1px solid Highlight; outline-offset: -2px; }
 }
+
+.nav-assistant {
+  color: #e7dcff;
+  border: 1px solid #9168ca;
+  background: linear-gradient(135deg, #42296a, #2a2148);
+}
+.nav-assistant:hover { color: #fff; background: #523782; }
+.mobile-menu-link.nav-assistant { display: flex; align-items: center; gap: .5rem; }
+.nav-assistant svg { inline-size: 1.1rem; block-size: 1.1rem; }

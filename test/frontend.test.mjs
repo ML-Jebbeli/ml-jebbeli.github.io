@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { access } from "node:fs/promises";
+import { access, mkdir, mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { after, before, test } from "node:test";
@@ -32,12 +33,13 @@ after(() => browser?.close());
 async function pageFor(t, {
   width = 1366, height = 768, theme = "dark", origin = site, path = "/", script = true, motion = "reduce",
   response = async () => ({ json: { answer: defaultAnswer } }), missing = () => false, initialize, beforeOpen,
+  persistentContext,
 } = {}) {
-  const context = await browser.newContext({
+  const context = persistentContext ?? await browser.newContext({
     viewport: { width, height }, reducedMotion: motion, javaScriptEnabled: script,
     hasTouch: width < 640, serviceWorkers: "block",
   });
-  t.after(() => context.close());
+  if (!persistentContext) t.after(() => context.close());
   await context.addInitScript((theme) => localStorage.setItem("theme", theme), theme);
   if (initialize) await context.addInitScript(initialize);
   const errors = [];
@@ -80,7 +82,7 @@ async function pageFor(t, {
   page.on("pageerror", (error) => errors.push(error.message));
   if (beforeOpen) await beforeOpen(page);
   await page.goto(origin + path, { waitUntil: "load" });
-  if (script) await page.locator("#themeToggle").waitFor();
+  if (script) await page.locator(path.startsWith("/assistant.html") ? "#assistantTheme" : "#themeToggle").waitFor();
   return { context, page, errors, calls, localPaths, missingFiles, releaseAssets };
 }
 
@@ -369,7 +371,7 @@ function gate() {
   return { resume, waiting };
 }
 
-test("stop and new conversation reject late responses, preserve drafts, and prevent double submit", async (t) => {
+test("stop rejects a late response and new conversation leaves a pending reply in its original thread", async (t) => {
   const first = gate();
   const second = gate();
   t.after(() => { first.resume(); second.resume(); });
@@ -405,9 +407,12 @@ test("stop and new conversation reject late responses, preserve drafts, and prev
   await ask(page, "گفتگوی تازه", 1);
   assert.equal(calls.length, 3);
   assert.deepEqual(calls.at(-1), { message: "گفتگوی تازه", history: [] });
-  assert.equal(await page.evaluate(() => window.abortsObserved), 2);
+  assert.equal(await page.evaluate(() => window.abortsObserved), 1);
   assert.equal(await page.locator(".course-chat-exchange").count(), 1);
   assert.doesNotMatch(await textOf(page, "#courseChatLog"), /پاسخ دیرهنگام/u);
+  await page.locator("#courseChatHistory").selectOption({ label: "پرسش نخست" });
+  await page.getByText("پاسخ دیرهنگام", { exact: true }).waitFor();
+  assert.equal(await inputFor(page).inputValue(), "متن تازه در حال تایپ");
 });
 
 test("timeout, offline and reconnect preserve input and issue no automatic retry", async (t) => {
@@ -421,7 +426,9 @@ test("timeout, offline and reconnect preserve input and issue no automatic retry
     },
   });
   await openChat(page);
+  const request = page.waitForRequest(request => request.url() === worker && request.method() === "POST");
   await ask(page, "سؤال زمان‌دار");
+  await request;
   await page.clock.fastForward(60_005);
   await visible(page.locator(".course-chat-failure"));
   assert.match(await textOf(page, ".course-chat-failure p"), /زمان انتظار/u);
@@ -445,7 +452,7 @@ test("timeout, offline and reconnect preserve input and issue no automatic retry
   assert.equal(await page.locator(".course-chat-exchange").count(), 1);
 });
 
-test("keeps six history messages, caps the visible transcript, and retains it only in page memory", { skip: engine !== "chromium" }, async (t) => {
+test("keeps six history messages and persists the bounded transcript across reloads", { skip: engine !== "chromium" }, async (t) => {
   const { page, calls } = await pageFor(t);
   await openChat(page);
   for (let i = 1; i <= 62; i++) {
@@ -460,10 +467,12 @@ test("keeps six history messages, caps the visible transcript, and retains it on
   await page.locator("#courseChatClose").click();
   await openChat(page);
   assert.equal(await page.locator(".course-chat-exchange").count(), 60);
-  assert.deepEqual(await page.evaluate(() => [Object.keys(localStorage), sessionStorage.length, document.cookie]), [["theme"], 0, ""]);
+  assert.deepEqual(await page.evaluate(() => [
+    Object.keys(localStorage).sort(), Object.keys(sessionStorage), document.cookie,
+  ]), [["iustech-conversations", "theme"], ["iustech-selection-embedded"], ""]);
   await page.reload({ waitUntil: "load" });
   await openChat(page);
-  assert.equal(await page.locator(".course-chat-exchange").count(), 0);
+  assert.equal(await page.locator(".course-chat-exchange").count(), 60);
 });
 
 test("request byte and character limits drop whole historical pairs", async (t) => {
@@ -861,6 +870,7 @@ test("fresh and repeat loads use one version across all local entry points and m
   const { page, releaseAssets, errors, missingFiles } = await pageFor(t);
   const entry = new Set([
     "site.css", "course-chat.css", "site.js", "course-chat.js", "site-ui.js", "course-chat-render.js",
+    "chat-request.js", "chat-session.js", "chat-store.js", "chat-transcript.js",
   ]);
   for (let i = 0; i < 2; i++) {
     assert.deepEqual(new Set(releaseAssets.map(asset => asset.split("?")[0])), entry);
@@ -899,8 +909,10 @@ test("Classic is the default and the keyboard-accessible switch saves the select
   await page.reload();
   await openChat(page);
   assert.equal(await toggle.getAttribute("aria-pressed"), "true");
-  assert.equal(await page.locator(".course-chat-exchange").count(), 0);
-  assert.deepEqual(await page.evaluate(() => Object.keys(localStorage).sort()), ["course-chat-layout", "theme"]);
+  assert.equal(await page.locator(".course-chat-exchange").count(), 1);
+  assert.deepEqual(await page.evaluate(() => Object.keys(localStorage).sort()), [
+    "course-chat-layout", "iustech-conversations", "theme",
+  ]);
   await toggle.press("Enter");
   await page.reload();
   await openChat(page);
@@ -1085,4 +1097,281 @@ test("Focused keeps its input, pending stop and layout switch reachable above a 
   await visible(page.locator(".course-chat-failure"));
   assert.equal(calls.length, 1);
   assert.equal(await inputFor(page).inputValue(), draft);
+});
+
+const assistantPath = "/assistant.html";
+const disclaimer = "این دستیار هوشمند ممکن است خطا کند، اطلاعات مهم را با پشتیبانی دابل چک کنید.";
+const assistantInput = page => page.locator("#assistantInput");
+const assistantAnswer = page => page.locator("#assistantLog .course-chat-answer");
+const thread = (page, title) => page.locator("#conversationList").getByRole("button", { name: title, exact: true });
+const sendAssistant = async (page, question) => {
+  await assistantInput(page).fill(question);
+  await assistantInput(page).press("Enter");
+};
+
+test("opens the standalone assistant in a new tab and shares independent conversations with the widget", async t => {
+  const held = gate();
+  t.after(held.resume);
+  const { context, page, calls, errors } = await pageFor(t, {
+    response: async ({ message }) => {
+      if (message === "A2 pending") await held.waiting;
+      return { json: { answer: "پاسخ " + message } };
+    },
+  });
+  const headerLink = page.locator("header a[href='./assistant.html']");
+  assert.equal(await headerLink.getAttribute("target"), "_blank");
+  assert.equal(await headerLink.getAttribute("rel"), "noopener noreferrer");
+  const [assistant] = await Promise.all([context.waitForEvent("page"), headerLink.click()]);
+  await assistant.waitForURL(site + assistantPath);
+  await visible(assistant.getByText(disclaimer, { exact: true }));
+  assert.equal(await assistant.locator("main[role=dialog], main dialog[open]").count(), 0);
+  await openChat(page);
+  await visible(page.getByText(disclaimer, { exact: true }));
+  await ask(page, "A1 آغاز", 1);
+  await thread(assistant, "A1 آغاز").click();
+  assert.deepEqual(await assistantAnswer(assistant).allTextContents(), ["پاسخ A1 آغاز"]);
+
+  await sendAssistant(assistant, "A2 pending");
+  await visible(assistant.locator("#assistantStop"));
+  await assistantInput(assistant).fill("پیش‌نویس A");
+  await assistant.locator("#newConversation").click();
+  assert.equal(await thread(assistant, "A1 آغاز").isVisible(), true);
+  await visible(assistant.locator("#assistantWelcome"));
+  await sendAssistant(assistant, "B1 مستقل");
+  await visible(assistantAnswer(assistant));
+  await assistantInput(assistant).fill("پیش‌نویس B");
+  held.resume();
+  assert.deepEqual(await assistantAnswer(assistant).allTextContents(), ["پاسخ B1 مستقل"]);
+  assert.equal(await assistantInput(assistant).inputValue(), "پیش‌نویس B");
+
+  await visible(page.getByText("پاسخ A2 pending", { exact: true }));
+  assert.deepEqual(await assistantAnswer(assistant).allTextContents(), ["پاسخ B1 مستقل"]);
+  assert.equal(await thread(assistant, "B1 مستقل").getAttribute("aria-current"), "true");
+  assert.equal(await page.locator("#courseChatHistory option:checked").textContent(), "A1 آغاز");
+  await page.locator("#courseChatHistory").selectOption({ label: "B1 مستقل" });
+  await visible(page.getByText("پاسخ B1 مستقل", { exact: true }));
+  await thread(assistant, "A1 آغاز").click();
+  assert.deepEqual(await assistantAnswer(assistant).allTextContents(), ["پاسخ A1 آغاز", "پاسخ A2 pending"]);
+  assert.equal(await assistantInput(assistant).inputValue(), "پیش‌نویس A");
+  await thread(assistant, "B1 مستقل").click();
+  assert.equal(await assistantInput(assistant).inputValue(), "پیش‌نویس B");
+  await sendAssistant(assistant, "B2 ادامه");
+  await visible(assistant.getByText("پاسخ B2 ادامه", { exact: true }));
+  assert.deepEqual(calls, [
+    { message: "A1 آغاز", history: [] },
+    { message: "A2 pending", history: [{ role: "user", content: "A1 آغاز" }, { role: "assistant", content: "پاسخ A1 آغاز" }] },
+    { message: "B1 مستقل", history: [] },
+    { message: "B2 ادامه", history: [{ role: "user", content: "B1 مستقل" }, { role: "assistant", content: "پاسخ B1 مستقل" }] },
+  ]);
+  await assistant.reload();
+  await visible(assistant.getByText("پاسخ B2 ادامه", { exact: true }));
+  assert.equal(await thread(assistant, "B1 مستقل").getAttribute("aria-current"), "true");
+  await thread(assistant, "A1 آغاز").click();
+  assert.equal(await assistantInput(assistant).inputValue(), "پیش‌نویس A");
+  const remove = assistant.getByRole("button", { name: "حذف گفتگو: A1 آغاز" });
+  assistant.once("dialog", dialog => dialog.dismiss());
+  await remove.click();
+  await visible(thread(assistant, "A1 آغاز"));
+  assistant.once("dialog", dialog => dialog.accept());
+  await remove.click();
+  await hidden(thread(assistant, "A1 آغاز"));
+  await page.waitForFunction(() => !Array.from(document.querySelector("#courseChatHistory").options).some(option => option.text === "A1 آغاز"));
+  await visible(thread(assistant, "B1 مستقل"));
+  assert.deepEqual(errors, []);
+});
+
+test("standalone history survives a real browser restart", { skip: engine !== "chromium" }, async t => {
+  const profile = await mkdtemp(join(tmpdir(), "jebbeli-profile-"));
+  t.after(() => rm(profile, { recursive: true, force: true }));
+  const launch = () => chromium.launchPersistentContext(profile, {
+    executablePath: process.env.CHROMIUM_EXECUTABLE, serviceWorkers: "block",
+  });
+  let context = await launch();
+  try {
+    const { page } = await pageFor(t, { path: assistantPath, persistentContext: context });
+    await sendAssistant(page, "گفتگوی قابل بازیابی");
+    await visible(assistantAnswer(page));
+    await assistantInput(page).fill("پیش‌نویس ماندگار");
+    await page.waitForFunction(() => JSON.parse(localStorage.getItem("iustech-conversations")).conversations[0].draft === "پیش‌نویس ماندگار");
+  } finally {
+    await context.close();
+  }
+  context = await launch();
+  try {
+    const { page } = await pageFor(t, { path: assistantPath, persistentContext: context });
+    await visible(thread(page, "گفتگوی قابل بازیابی"));
+    await visible(assistantAnswer(page));
+    assert.equal(await assistantInput(page).inputValue(), "پیش‌نویس ماندگار");
+  } finally {
+    await context.close();
+  }
+});
+
+test("standalone keeps a retry in its original context and shares a 503 cooldown across tabs", async t => {
+  const { context, page, calls } = await pageFor(t, {
+    path: assistantPath,
+    beforeOpen: page => page.clock.install(),
+    response: async (_, index) => index === 2
+      ? { status: 503, headers: { "Retry-After": "10" }, json: {} }
+      : { json: { answer: defaultAnswer } },
+  });
+  await sendAssistant(page, "سؤال یک");
+  await visible(assistantAnswer(page));
+  await sendAssistant(page, "سؤال دو");
+  const retry = page.getByRole("button", { name: "تلاش دوباره" });
+  await visible(retry);
+  assert.equal(await retry.isDisabled(), true);
+  const otherTab = await context.newPage();
+  await otherTab.goto(site + assistantPath);
+  await visible(otherTab.getByRole("button", { name: "تلاش دوباره" }));
+  assert.equal(await otherTab.getByRole("button", { name: "تلاش دوباره" }).isDisabled(), true);
+  await page.locator("#newConversation").click();
+  await visible(page.locator("#assistantWelcome"));
+  await assistantInput(page).fill("پیش‌نویس دیگر");
+  assert.equal(await page.locator("#assistantSend").isDisabled(), true);
+  await page.clock.fastForward(10_020);
+  await otherTab.waitForFunction(() => !document.querySelector(".course-chat-failure button").disabled);
+  assert.equal(calls.length, 2);
+  await thread(page, "سؤال یک").click();
+  await retry.click();
+  await visible(assistantAnswer(page).nth(1));
+  assert.deepEqual(calls[2], calls[1]);
+  await thread(page, "گفتگوی جدید").click();
+  assert.equal(await assistantInput(page).inputValue(), "پیش‌نویس دیگر");
+});
+
+test("standalone handles corrupt browser storage and reports quota failures without losing the active exchange", async t => {
+  const { page, errors } = await pageFor(t, {
+    path: assistantPath,
+    initialize: () => {
+      localStorage.setItem("iustech-conversations", "{broken");
+      const setItem = Storage.prototype.setItem;
+      Storage.prototype.setItem = function (key, value) {
+        if (key === "iustech-conversations") throw new DOMException("Full", "QuotaExceededError");
+        return setItem.call(this, key, value);
+      };
+    },
+  });
+  await visible(page.locator("#assistantWelcome"));
+  await sendAssistant(page, "پیام در حافظه");
+  await visible(assistantAnswer(page));
+  await visible(page.locator("#assistantWarning"));
+  await page.locator("#newConversation").click();
+  await visible(page.locator("#assistantWelcome"));
+  await thread(page, "پیام در حافظه").click();
+  assert.deepEqual(await assistantAnswer(page).allTextContents(), [defaultAnswer]);
+  assert.deepEqual(errors, []);
+});
+
+test("standalone reflows at the requested widths, supports the mobile drawer and keeps the composer above the keyboard", async t => {
+  const { page, calls, errors } = await pageFor(t, { path: assistantPath, width: 390, height: 844 });
+  const requiredWidths = [320, 360, 390, 430, 768, 1024, 1280, 1440, 1920];
+  for (const width of requiredWidths) {
+    const height = width < 768 ? 844 : 900;
+    await page.setViewportSize({ width, height });
+    for (const color of ["dark", "light"]) {
+      if (await page.locator("html").getAttribute("data-theme") !== color) await page.locator("#assistantTheme").click();
+      assert.equal(await page.locator("#assistantSidebar").isVisible(), width >= 768);
+      const bounds = await assistantInput(page).boundingBox();
+      assert.ok(bounds && bounds.x >= 0 && bounds.x + bounds.width <= width && bounds.y + bounds.height < height);
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+      await visible(page.getByText(disclaimer, { exact: true }));
+    }
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator("#openHistory").click();
+  await visible(page.locator("#historyDrawer[open]"));
+  await page.keyboard.press("Escape");
+  await hidden(page.locator("#historyDrawer"));
+  assert.equal(await page.evaluate(() => document.activeElement.id), "openHistory");
+  await page.locator("#openHistory").click();
+  await page.locator("#newConversation").click();
+  await hidden(page.locator("#historyDrawer"));
+  await page.locator(".assistant-suggestions button").first().click();
+  assert.match(await assistantInput(page).inputValue(), /دوره یادگیری ماشین/u);
+  assert.equal(calls.length, 0);
+  await assistantInput(page).press("End");
+  await assistantInput(page).press("Shift+Enter");
+  await assistantInput(page).pressSequentially("PyTorch");
+  assert.match(await assistantInput(page).inputValue(), /\nPyTorch$/u);
+  await page.evaluate(() => {
+    Object.defineProperties(visualViewport, {
+      height: { value: 300, configurable: true },
+      offsetTop: { value: 0, configurable: true },
+    });
+    visualViewport.dispatchEvent(new Event("resize"));
+  });
+  for (const id of ["assistantInput", "assistantSend", "assistantDisclaimer"]) {
+    const box = await page.locator("#" + id).boundingBox();
+    assert.ok(box && box.y >= 0 && box.y + box.height <= 300, JSON.stringify(box));
+  }
+  assert.deepEqual(errors, []);
+});
+
+test("mobile navigation opens the standalone page in a new tab", async t => {
+  const { context, page, errors } = await pageFor(t, { width: 320, height: 640 });
+  await page.locator("#navToggle").click();
+  const [assistant] = await Promise.all([
+    context.waitForEvent("page"),
+    page.locator("#mobileMenu").getByRole("link", { name: "دستیار هوشمند" }).click(),
+  ]);
+  await assistant.waitForURL(site + assistantPath);
+  await visible(assistant.locator("#assistantWelcome"));
+  await hidden(page.locator("#mobileMenu"));
+  assert.deepEqual(errors, []);
+});
+
+test("standalone passes axe in both themes and in the mobile history drawer", { skip: engine !== "chromium" }, async t => {
+  const { page } = await pageFor(t, {
+    path: assistantPath, width: 1440, height: 900,
+    response: async () => ({ json: { answer: "### مثال PyTorch\n\n```python\nx = 1\n```" } }),
+  });
+  await page.addScriptTag({ content: axe.source });
+  const audit = async () => {
+    const violations = await page.evaluate(async () => (await axe.run({
+      runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"] },
+    })).violations.map(({ id, nodes }) => ({ id, targets: nodes.map(node => node.target) })));
+    assert.deepEqual(violations, []);
+  };
+  await audit();
+  const screenshots = process.env.JEBBELI_SCREENSHOTS;
+  if (screenshots) {
+    await mkdir(screenshots, { recursive: true });
+    await page.evaluate(() => document.fonts.ready);
+    await page.screenshot({ path: join(screenshots, "assistant-desktop.png") });
+  }
+  await sendAssistant(page, "نمونهٔ کد PyTorch");
+  await visible(assistantAnswer(page));
+  await audit();
+  await page.locator("#assistantTheme").click();
+  await audit();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator("#openHistory").click();
+  await visible(page.locator("#historyDrawer[open]"));
+  await audit();
+  if (screenshots) {
+    await page.locator("#closeHistory").click();
+    await page.locator("#assistantTheme").click();
+    await page.locator("#openHistory").click();
+    await page.screenshot({ path: join(screenshots, "assistant-mobile-history.png") });
+    await page.locator("#newConversation").click();
+    await hidden(page.locator("#historyDrawer"));
+    await page.screenshot({ path: join(screenshots, "assistant-mobile.png") });
+  }
+});
+
+test("switching standalone conversations restores the transcript reading position", async t => {
+  const { page } = await pageFor(t, {
+    path: assistantPath, width: 1024, height: 600,
+    response: async () => ({ json: { answer: (defaultAnswer + "\n\n").repeat(35) } }),
+  });
+  await sendAssistant(page, "گفتگوی طولانی");
+  await visible(assistantAnswer(page));
+  await page.locator("#assistantLog").evaluate(log => { log.scrollTop = 112; });
+  await visible(page.locator("#assistantJump"));
+  await page.locator("#newConversation").click();
+  await visible(page.locator("#assistantWelcome"));
+  await thread(page, "گفتگوی طولانی").click();
+  await visible(page.locator("#assistantJump"));
+  assert.equal(await page.locator("#assistantLog").evaluate(log => log.scrollTop), 112);
 });

@@ -66,11 +66,11 @@
 </script>
 
 <link rel="preload" href="assets/fonts/vazirmatn-arabic-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
-<link rel="stylesheet" href="site.css?v=4" />
+<link rel="stylesheet" href="site.css?v=5" />
 <link rel="preload" as="image" href="assets/instructor-320.webp"
   imagesrcset="assets/instructor-320.webp 320w, assets/instructor-640.webp 640w"
   imagesizes="(max-width: 639px) 9rem, (min-width: 75rem) 18rem, (min-width: 43rem) 24vw, 10.25rem" fetchpriority="high" />
-<link rel="stylesheet" href="course-chat.css?v=4" />
+<link rel="stylesheet" href="course-chat.css?v=5" />
 <noscript><style>
   @media (max-width: 71.999rem) {
     .navbar { position: static; background: var(--bg-card); }
@@ -105,6 +105,10 @@
           <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
           <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
         </button>
+        <a class="btn nav-cta nav-assistant" href="./assistant.html" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2c1.4 5.6 3.4 7.6 9 9-5.6 1.4-7.6 3.4-9 9-1.4-5.6-3.4-7.6-9-9 5.6-1.4 7.6-3.4 9-9Zm7 14v5m-2.5-2.5h5"/></svg>
+          دستیار هوشمند
+        </a>
         <a class="btn btn-primary nav-cta" href="https://t.me/Iustech_support" target="_blank" rel="noopener noreferrer">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.9369 12.9104 18.5709 9.27638C19.0991 8.74812 19.0991 7.88916 18.5709 7.3609L15.4826 4.27262C14.9543 3.74436 14.0954 3.74436 13.5671 4.27262L6.07086 11.7689M14.9369 12.9104 7.42909 20.4083C6.90083 20.9365 6.04187 20.9365 5.51361 20.4083L4.42931 19.324C3.90105 18.7957 3.90105 17.9368 4.42931 17.4085L11.9271 9.91075M14.9369 12.9104 11.9271 9.91075"/></svg>
           اعلام علاقه‌مندی
@@ -133,6 +137,7 @@
       <a class="mobile-menu-link" href="#instructor">مدرس</a>
       <a class="mobile-menu-link" href="#resources">منابع رایگان</a>
       <a class="mobile-menu-link" href="#faq">سؤالات متداول</a>
+      <a class="mobile-menu-link nav-assistant" href="./assistant.html" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2c1.4 5.6 3.4 7.6 9 9-5.6 1.4-7.6 3.4-9 9-1.4-5.6-3.4-7.6-9-9 5.6-1.4 7.6-3.4 9-9Zm7 14v5m-2.5-2.5h5"/></svg>دستیار هوشمند</a>
     </nav>
     <a class="btn btn-primary" href="https://t.me/Iustech_support" target="_blank" rel="noopener noreferrer">اعلام علاقه‌مندی به دوره 🚀</a>
   </div>
@@ -814,18 +819,21 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 18V6m-6 6 6-6 6 6"/></svg>
         </button>
       </form>
+      <p class="course-chat-disclaimer">این دستیار هوشمند ممکن است خطا کند، اطلاعات مهم را با پشتیبانی دابل چک کنید.</p>
+      <p class="course-chat-disclaimer" id="courseChatStorage" role="status" hidden></p>
       <div class="course-chat-meta">
         <p class="course-chat-help"><a href="https://t.me/Iustech_support" target="_blank" rel="noopener noreferrer">پشتیبانی تلگرام</a></p>
         <button class="course-chat-variant" id="courseChatVariant" type="button" aria-pressed="false">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M9 5v14"/></svg>
           نمای متمرکز
         </button>
+        <select id="courseChatHistory" aria-label="گفتگوهای اخیر"></select>
         <span class="course-chat-count" id="courseChatCount">۰ از ۵۰۰ نویسه</span>
       </div>
     </div>
   </dialog>
 </div>
-<script src="site.js?v=4" type="module"></script>
-<script src="course-chat.js?v=4" type="module"></script>
+<script src="site.js?v=5" type="module"></script>
+<script src="course-chat.js?v=5" type="module"></script>
 </body>
 </html>

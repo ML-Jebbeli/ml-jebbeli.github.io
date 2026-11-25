@@ -5,7 +5,10 @@ import { pathToFileURL } from "node:url";
 import { parse as parseJs } from "acorn";
 import { parse as parseHtml } from "parse5";
 
-const scripts = ["site.js", "site-ui.js", "course-chat.js", "course-chat-render.js"];
+const scripts = [
+  "site.js", "site-ui.js", "course-chat.js", "course-chat-render.js",
+  "chat-request.js", "chat-session.js", "chat-transcript.js", "chat-store.js", "assistant.js",
+];
 const attrs = new Set(["id", "lang", "dir", "title", "alt", "placeholder", "aria-label", "aria-description",
   "aria-labelledby", "aria-describedby", "data-target", "data-thumbnail", "data-poster", "data-knowledge-source"]);
 const textualSink = /^(?:textContent|innerText|innerHTML|ariaLabel|alt|title|placeholder)$/u;
@@ -96,8 +99,9 @@ export function collect(root) {
   }
 
   walk(parseHtml(read("index.html"), { scriptingEnabled: false }), "page");
+  walk(parseHtml(read("assistant.html"), { scriptingEnabled: false }), "assistant");
   scripts.forEach(name => fromScript(read(name), name));
-  for (const name of ["site.css", "course-chat.css"]) styles.push(read(name));
+  for (const name of ["site.css", "course-chat.css", "assistant.css"]) styles.push(read(name));
   for (const style of styles) {
     for (const match of style.matchAll(/(?:[;{])\s*content\s*:\s*("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/gu)) {
       if (match[1].length > 2) add("css:content", match[1]);
@@ -128,11 +132,23 @@ if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.m
       if (Object.hasOwn(before.entries, id)) throw new Error(`An addition cannot override a baseline entry: ${id}`);
     }
     const expected = { ...before.entries, ...additions };
+    const release = raw ? JSON.parse(readFileSync(raw, "utf8")) : { moves: {}, additions: {} };
+    // A move carries forward the original hash, including when a refactor
+    // shifts ordinal keys within the same function.
+    const moved = Object.entries(release.moves).map(([from, to]) => {
+      if (!Object.hasOwn(expected, from)) throw new Error(`Unknown content origin: ${from}`);
+      return [to, expected[from]];
+    });
+    for (const from of Object.keys(release.moves)) delete expected[from];
+    for (const [id, hash] of [...moved, ...Object.entries(release.additions)]) {
+      if (Object.hasOwn(expected, id)) throw new Error(`Duplicate content entry: ${id}`);
+      expected[id] = hash;
+    }
     const updated = hashed(current);
     const differences = [...new Set([...Object.keys(expected), ...Object.keys(updated)])]
       .filter(id => expected[id] !== updated[id]);
     console.log(JSON.stringify({ base: before.base, entries: Object.keys(before.entries).length,
-      approvedAdditions: Object.keys(additions).length, differences: differences.length }));
+      approvedAdditions: Object.keys(additions).length + Object.keys(release.additions).length, differences: differences.length }));
     if (differences.length) {
       console.error(differences.join("\n"));
       process.exitCode = 1;

@@ -14,3 +14,11 @@ Here are some ideas to get you started:
 - 😄 Pronouns: ...
 - ⚡ Fun fact: ...
 -->
+
+## Assistant workspace
+
+Open the site's «دستیار هوشمند» link or visit `assistant.html` directly. The floating widget and standalone workspace share conversations, drafts, and answers through versioned local storage on the same origin. The standalone history list includes a delete action for each conversation. Selection is kept per tab. Browser storage does not sync across devices, browsers, profiles, or the GitHub Pages and Cloudflare preview origins. Clearing that origin's site data clears its conversation history.
+
+History keeps up to 30 conversations and the latest 60 exchanges per conversation. At the conversation limit, delete a conversation to make room. If browser storage is unavailable or full, the interface shows a warning and keeps new changes in the current page's memory. The Worker receives the current question and up to six messages from completed exchanges in the selected conversation. The request body limit is 32 KiB. The site does not send an unsubmitted draft.
+
+Run the frontend and content checks with `npm ci`, `npx playwright install chromium`, `npm test`, and `npm run test:content`. The browser tests simulate Worker responses. Sending live requests is enabled only on the two approved hostnames.

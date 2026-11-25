@@ -52,6 +52,12 @@ try {
   async function load(state = "") {
     response = state;
     await page.clock.setFixedTime(new Date("2026-11-26T10:00:00Z"));
+    if (page.url().startsWith(origin)) {
+      await page.evaluate(() => {
+        localStorage.removeItem("iustech-conversations");
+        sessionStorage.removeItem("iustech-selection-embedded");
+      });
+    }
     await page.goto(origin + "/?" + state);
     await page.locator("#courseChatLaunch").click();
   }
@@ -71,6 +77,7 @@ try {
   await page.locator(".course-chat-copy").click();
   await snapshot("copy-feedback", ".course-chat-copy");
   await page.locator("#courseChatNew").click();
+  await page.locator("#courseChatWelcome").waitFor();
   await snapshot("reset", "#courseChatStatus");
   for (const state of [...Object.keys(replies), "network"]) {
     await load(state);
@@ -81,7 +88,9 @@ try {
   }
   for (const state of ["cancel", "timeout"]) {
     await load("hold");
+    const sent = page.waitForRequest(request => request.url() === worker && request.method() === "POST");
     await ask(state);
+    await sent;
     await page.locator("#courseChatStop").waitFor();
     await snapshot("loading", "#courseChatStatus");
     await page.clock.fastForward(12001);

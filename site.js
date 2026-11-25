@@ -1,4 +1,4 @@
-import { closeDialog, copyText, listenToMedia, openModal } from "./site-ui.js?v=4";
+import { closeDialog, copyText, listenToMedia, openModal } from "./site-ui.js?v=5";
 
 const page = document.documentElement;
 const byId = (id) => document.getElementById(id);
@@ -71,8 +71,8 @@ function initNavigation() {
         if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         closeDialog(menu);
         const target = byId(link.hash.slice(1));
-        target.setAttribute("tabindex", "-1");
-        target.focus({ preventScroll: true });
+        target?.setAttribute("tabindex", "-1");
+        target?.focus({ preventScroll: true });
       });
     }
     listenToMedia(desktopNavigation, (event) => {
