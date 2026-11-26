@@ -58,7 +58,7 @@ try {
         sessionStorage.removeItem("iustech-selection-embedded");
       });
     }
-    await page.goto(origin + "/?" + state);
+    await page.goto(origin + "/?legacy-chat=1&" + state);
     await page.locator("#courseChatLaunch").click();
   }
   await load();

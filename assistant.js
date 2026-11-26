@@ -1,7 +1,7 @@
-import { approvedHosts } from "./chat-request.js?v=5";
-import { createChatSession } from "./chat-session.js?v=5";
-import { createTranscript } from "./chat-transcript.js?v=5";
-import { closeDialog, listenToMedia, openModal } from "./site-ui.js?v=5";
+import { approvedHosts } from "./chat-request.js?v=6";
+import { createChatSession } from "./chat-session.js?v=6";
+import { createTranscript } from "./chat-transcript.js?v=6";
+import { closeDialog, listenToMedia, openModal } from "./site-ui.js?v=6";
 
 const byId = name => document.getElementById(name);
 const app = byId("assistantApp");

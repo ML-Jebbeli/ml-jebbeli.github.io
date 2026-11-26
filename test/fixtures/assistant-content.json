@@ -34,7 +34,8 @@
     "script:course-chat.js[3]": "script:chat-request.js[3]",
     "script:course-chat.js[4]": "script:chat-request.js[4]",
     "script:course-chat.js[5]": "script:chat-request.js[5]",
-    "script:course-chat.js[6]": "script:chat-request.js[6]"
+    "script:course-chat.js[6]": "script:chat-request.js[6]",
+    "attribute:#courseChatLaunch:button:id[1]": "attribute:#courseChatLaunch:a:id[1]"
   },
   "additions": {
     "attribute:#assistantApp:div:id[1]": "8104928df06c8c64a8a5f47e106a1f12d1c8fbc5eafa931728e562eb18197b01",
@@ -107,8 +108,6 @@
     "attribute:#icon-send:symbol:id[1]": "27a24a316591a83652d212c2f1ad5d0dfe7fce54ddf05f339a8b845be793d4b6",
     "attribute:#icon-spark:symbol:id[1]": "146b3309af2960f9e914867a879dfc4541ef9e9694008823b2290d87e75da67e",
     "attribute:#icon-sun:symbol:id[1]": "9f2fad68a8eafe7d18e42086fb7a45c7a3a4542f24d387e19d08f10cf38bc11a",
-    "attribute:#mobileMenu/nav/a:./assistant.html:a:href[1]": "9dd15a679e1e1fc2b3e457e351bf927ac84441218488eb09f825e3f62a25c0b7",
-    "attribute:#navbar/nav/a:./assistant.html:a:href[1]": "9dd15a679e1e1fc2b3e457e351bf927ac84441218488eb09f825e3f62a25c0b7",
     "attribute:#newConversation:button:id[1]": "66645ce54816c9bc61bc6d2ac5c6fd3ca2d595d55599f56482f6e351d39dfe1d",
     "attribute:#newConversation:use:href[1]": "78aec1653cefcbf6fd5b94debc6217f15dc27a1e07c694844e97f0f675aaf690",
     "attribute:#openHistory:button:aria-label[1]": "b8de83349bbccb79ad357f3b72a1804fbfb00fdf20de89af38473ba3436c477c",
@@ -156,10 +155,14 @@
     "text:#courseChatPanel[1]": "15e810101fa55e4d2649e1a97f3d86941516e086086c1a7c0c0ecf46685e81a6",
     "text:#emptyHistory[1]": "d5bda0364c501914836162902148e5f2ff04470e5e2c5113f65bb79a8d3c871d",
     "text:#historyTitle[1]": "5c862c8ea88b43f3d02bc3fe5bd4c58a47c475052b6fcea49697ae47ba33904e",
-    "text:#mobileMenu/nav/a:./assistant.html[1]": "87330d425f5319d498af61fade9d749d18db304b67cf08ba33e2929850762ed8",
-    "text:#navbar/nav/a:./assistant.html[1]": "87330d425f5319d498af61fade9d749d18db304b67cf08ba33e2929850762ed8",
     "text:#newConversation[1]": "1cb2e79d7dd632de5ad07fa7b3950e98862e31dae747a7cf29caeeb547681b62",
     "text:#welcomeTitle[1]": "18e1e34840130961700463081b1cf1b57a8224d7ace378e8905809d79a37a9d7",
-    "text:assistant/title[1]": "c4107259b3403c0e45f70fa6e4c91c45b7b5d9bc7513377b30100531981bf7de"
+    "text:assistant/title[1]": "c4107259b3403c0e45f70fa6e4c91c45b7b5d9bc7513377b30100531981bf7de",
+    "attribute:#mobileMenu/nav/a:https://ml-jebbeli.github.io/assistant.html:a:href[1]": "1805c0afcbcd942fcb004549e161b9fa21467a0c4fff47caef82c47dcbfee7ef",
+    "attribute:#navbar/nav/a:https://ml-jebbeli.github.io/assistant.html:a:href[1]": "1805c0afcbcd942fcb004549e161b9fa21467a0c4fff47caef82c47dcbfee7ef",
+    "text:#mobileMenu/nav/a:https://ml-jebbeli.github.io/assistant.html[1]": "87330d425f5319d498af61fade9d749d18db304b67cf08ba33e2929850762ed8",
+    "text:#navbar/nav/a:https://ml-jebbeli.github.io/assistant.html[1]": "87330d425f5319d498af61fade9d749d18db304b67cf08ba33e2929850762ed8",
+    "attribute:#courseChatLaunch:a:href[1]": "1805c0afcbcd942fcb004549e161b9fa21467a0c4fff47caef82c47dcbfee7ef",
+    "script:course-chat-render.js/renderAnswer[1]": "c8d400fc2de0b15c0dfb3a365267f3f0e3d604b224bbbfb69452ab85b10fa795"
   }
 }

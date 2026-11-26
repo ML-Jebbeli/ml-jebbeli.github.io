@@ -1,3 +1,5 @@
+import { renderLimit } from "./chat-store.js?v=6";
+
 // Parse supported Markdown into DOM nodes. HTML-looking tokens stay text,
 // including attributes that contain an otherwise linkable address.
 const tokens = /<[^<>]*>|\[(?<label>(?:\\[^\r\n]|[^\\\[\]\r\n])+)\]\((?<destination>(?:[^()\r\n]|\([^()\r\n]*\))*)\)|(?<ticks>`+)|\*\*(?<bold>[^\r\n]+?)\*\*|(?<bare>https:\/\/(?:[^\s<>()\[\]{}*`،؛؟…]|\([^()\s<>]*\)|\[[^\[\]\s<>]*\])+)/giu;
@@ -180,6 +182,16 @@ function appendList(parent, lines, index, depth = 0) {
 }
 
 export function renderAnswer(parent, text, copyButton) {
+  // Older browser records may contain answers larger than today's limits.
+  // Display exceptionally large answers as inert, bounded text. The original
+  // remains available through the existing copy action.
+  if (text.length > renderLimit) {
+    const preview = document.createElement("p");
+    preview.dir = "auto";
+    preview.textContent = text.slice(0, renderLimit) + "…";
+    parent.append(preview);
+    return;
+  }
   const lines = text.split(/\r?\n/u);
   const headingLevels = [];
   let index = 0;

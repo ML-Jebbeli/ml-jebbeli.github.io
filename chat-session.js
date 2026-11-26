@@ -1,5 +1,5 @@
-import { addConversation, createStore, exchangeLimit, historyLimit, questionLimit, titleFrom } from "./chat-store.js?v=5";
-import { loading, offline, requestAnswer, requestTimeout, slow, stopWaiting } from "./chat-request.js?v=5";
+import { addConversation, createStore, exchangeLimit, historyLimit, questionLimit, titleFrom } from "./chat-store.js?v=6";
+import { loading, offline, requestAnswer, requestTimeout, slow, stopWaiting } from "./chat-request.js?v=6";
 
 const untitled = "گفتگوی جدید";
 const interrupted = "پاسخ ذخیره نشد. در صورت نیاز دوباره تلاش کن.";
@@ -58,8 +58,17 @@ export function createChatSession(surface, onChange) {
   }
 
   function notify() {
-    if (active === virtual && current()) virtual = undefined;
-    if (active !== virtual && !current()) {
+    const retained = new Set(store.read().map(record => record.id));
+    if (retained.has(virtual)) virtual = undefined;
+    for (const [id, request] of requests) {
+      if (id !== virtual && !retained.has(id)) stopWaiting(request.controller);
+    }
+    for (const entries of [drafts, statuses]) {
+      for (const id of entries.keys()) {
+        if (id !== virtual && !retained.has(id)) entries.delete(id);
+      }
+    }
+    if (active !== virtual && !retained.has(active)) {
       // The selected conversation was deleted, including from another tab.
       active = virtual = uuid();
     }
@@ -109,7 +118,8 @@ export function createChatSession(surface, onChange) {
 
   function change(id, mutate, allowCreate = false) {
     return store.update(records => {
-      const record = records.find(item => item.id === id) ?? (allowCreate ? addConversation(records, id) : null);
+      const mayCreate = allowCreate && id === virtual;
+      const record = records.find(item => item.id === id) ?? (mayCreate ? addConversation(records, id) : null);
       return record ? mutate(record) : null;
     });
   }
@@ -119,6 +129,7 @@ export function createChatSession(surface, onChange) {
     if (!text && id === virtual && !current() && !drafts.has(id)) return;
     drafts.set(id, text);
     const saved = await change(id, record => {
+      if (record.draft === text) return true;
       record.draft = text.slice(0, questionLimit);
       record.updatedAt = Date.now();
       if (record.turns.find(turn => turn.id === record.restoredTurn)?.user.content !== record.draft) record.restoredTurn = null;
@@ -133,7 +144,7 @@ export function createChatSession(surface, onChange) {
   }
 
   function blocked() {
-    return requests.has(active) || historyBusy() || !navigator.onLine || Date.now() < retryDeadline();
+    return store.atCapacity || requests.has(active) || historyBusy() || !navigator.onLine || Date.now() < retryDeadline();
   }
 
   function canRetry(turn) {
@@ -150,7 +161,14 @@ export function createChatSession(surface, onChange) {
     if (retryId) notify();
 
     const started = await change(id, record => {
-      if (record.turns.some(live) || Date.now() < retryDeadline()) return null;
+      if (controller.signal.aborted || store.atCapacity || record.turns.some(live) || Date.now() < retryDeadline()) return null;
+      // Expired attempts lose their claim before a new send can take it.
+      for (const expired of record.turns) {
+        if (!expired.attempt) continue;
+        delete expired.attempt;
+        delete expired.expires;
+        expired.error = interrupted;
+      }
       let turn = retryId ? record.turns.find(item => item.id === retryId) : null;
       if (retryId && (!turn || turn.assistant || turn.revision !== record.revision)) return null;
       if (!turn) {
@@ -167,7 +185,7 @@ export function createChatSession(surface, onChange) {
         record.restoredTurn = null;
       }
       record.updatedAt = Date.now();
-      return { turnId: turn.id, context: record.context };
+      return { turnId: turn.id, revision: turn.revision, context: record.context };
     }, id === virtual && !retryId);
 
     if (!started) {
@@ -186,7 +204,7 @@ export function createChatSession(surface, onChange) {
 
     await change(id, record => {
       const turn = record.turns.find(item => item.id === started.turnId);
-      if (turn?.attempt !== attempt) return null;
+      if (turn?.attempt !== attempt || record.revision !== started.revision) return null;
       if (result.cooldownUntil > Date.now()) record.cooldownUntil = result.cooldownUntil;
       delete turn.attempt;
       delete turn.expires;
@@ -229,7 +247,7 @@ export function createChatSession(surface, onChange) {
     title: record => record?.title || untitled,
     failure(turn) {
       if (requests.get(active)?.retryId === turn.id) return "";
-      return turn.error || (turn.attempt && !live(turn) ? interrupted : "");
+      return turn.error || (!turn.assistant && !live(turn) ? interrupted : "");
     },
     get active() { return active; },
     get draft() { return drafts.get(active) ?? current()?.draft ?? ""; },

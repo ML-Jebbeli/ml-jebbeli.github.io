@@ -1,3 +1,5 @@
+import { renderLimit } from "./chat-store.js?v=6";
+
 export const approvedHosts = new Set(["ml-jebbeli.github.io", "jebbeli-ai-preview.pages.dev"]);
 const endpoint = "https://jebbeli-ai-quota-lab-01.sedamir77.workers.dev/";
 export const requestTimeout = 60000;
@@ -60,6 +62,31 @@ function requestBody(question, history) {
   return null;
 }
 
+async function responseData(response) {
+  const limit = 256 * 1024;
+  const stream = response.body?.getReader();
+  if (!stream) return null;
+  const decoder = new TextDecoder();
+  let size = 0;
+  let text = "";
+  try {
+    for (;;) {
+      const { value, done } = await stream.read();
+      if (done) return JSON.parse(text + decoder.decode());
+      size += value.byteLength;
+      if (size > limit) {
+        void stream.cancel().catch(() => {});
+        return null;
+      }
+      text += decoder.decode(value, { stream: true });
+    }
+  } catch {
+    return null;
+  } finally {
+    stream.releaseLock();
+  }
+}
+
 export async function requestAnswer(question, history, controller, onSlow) {
   const body = requestBody(question, history);
   if (!body) return { error: "حجم درخواست بیش از حد مجاز است." };
@@ -85,12 +112,12 @@ export async function requestAnswer(question, history, controller, onSlow) {
         signal: controller.signal,
       });
       const wait = [429, 503].includes(response.status) ? retryAfter(response.headers.get("Retry-After"), Date.now()) : null;
-      const data = await response.json().catch(() => null);
+      const data = await responseData(response);
       if (!response.ok) return {
         error: responseError(response, data?.error?.code, wait?.seconds ?? null),
         cooldownUntil: wait?.until ?? 0,
       };
-      if (typeof data?.answer === "string" && data.answer.trim()) return { answer: data.answer };
+      if (typeof data?.answer === "string" && data.answer.length <= renderLimit && data.answer.trim()) return { answer: data.answer };
       return { error: invalidAnswer };
     } catch {
       return controller.signal.aborted ? controller.signal.reason : {
