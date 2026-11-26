@@ -1,4 +1,4 @@
-import { closeDialog, copyText, listenToMedia, openModal } from "./site-ui.js?v=5";
+import { closeDialog, copyText, listenToMedia, openModal } from "./site-ui.js?v=6";
 
 const page = document.documentElement;
 const byId = (id) => document.getElementById(id);
@@ -491,3 +491,15 @@ copyButton.addEventListener("click", async () => {
   byId("copyStatus").textContent = copied ? "پیام کپی شد." : "کپی خودکار ممکن نشد. می‌توانید متن زیر را انتخاب و کپی کنید.";
   preparedMessage.hidden = false;
 });
+
+const chatBanner = byId("courseChatLaunch");
+const bannerLogo = chatBanner.querySelector("img");
+const refreshBannerLogo = () => {
+  bannerLogo.hidden = !bannerLogo.naturalWidth;
+  bannerLogo.parentElement.classList.toggle("has-image", !bannerLogo.hidden);
+};
+for (const event of ["load", "error"]) bannerLogo.addEventListener(event, refreshBannerLogo);
+if (bannerLogo.complete) refreshBannerLogo();
+if (new URLSearchParams(location.search).get("legacy-chat") === "1") {
+  void import("./course-chat.js?v=6");
+}

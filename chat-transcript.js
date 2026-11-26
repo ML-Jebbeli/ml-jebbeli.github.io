@@ -1,5 +1,5 @@
-import { renderAnswer } from "./course-chat-render.js?v=5";
-import { copyText } from "./site-ui.js?v=5";
+import { renderAnswer } from "./course-chat-render.js?v=6";
+import { copyText } from "./site-ui.js?v=6";
 
 export function createTranscript({ container, avatarTemplate, copyRoot, canCopy, retryTurn }) {
   const exchanges = [];

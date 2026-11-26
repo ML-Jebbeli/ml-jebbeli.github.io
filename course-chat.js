@@ -1,16 +1,24 @@
-import { closeDialog, hasOtherModal, listenToMedia, openModal } from "./site-ui.js?v=5";
-import { approvedHosts } from "./chat-request.js?v=5";
-import { createChatSession } from "./chat-session.js?v=5";
-import { createTranscript } from "./chat-transcript.js?v=5";
+import { closeDialog, hasOtherModal, listenToMedia, openModal } from "./site-ui.js?v=6";
+import { approvedHosts } from "./chat-request.js?v=6";
+import { createChatSession } from "./chat-session.js?v=6";
+import { createTranscript } from "./chat-transcript.js?v=6";
 
 const variantPreference = "course-chat-layout";
 const fa = new Intl.NumberFormat("fa-IR");
 
 function init() {
   const byId = (name) => document.getElementById("courseChat" + name);
-  const launch = byId("Launch");
+  const banner = byId("Launch");
   const panel = byId("Panel");
-  if (!launch || typeof panel?.show !== "function") return;
+  if (!banner || typeof panel?.show !== "function") return;
+  const launch = document.createElement("button");
+  launch.id = banner.id;
+  launch.className = banner.className;
+  launch.type = "button";
+  launch.setAttribute("aria-expanded", "false");
+  launch.setAttribute("aria-controls", panel.id);
+  launch.append(...banner.childNodes);
+  banner.replaceWith(launch);
   const close = byId("Close");
   const reset = byId("New");
   const expand = byId("Expand");
@@ -381,4 +389,4 @@ function init() {
   launch.hidden = false;
 }
 
-if (approvedHosts.has(window.location.hostname)) init();
+if (approvedHosts.has(location.hostname) && new URLSearchParams(location.search).get("legacy-chat") === "1") init();
